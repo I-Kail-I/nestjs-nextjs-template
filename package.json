@@ -1,0 +1,38 @@
+{
+  "name": "nestjs-nextjs-template",
+  "version": "1.0.0",
+  "description": "Template's for nextjs and nestjs so I dont need to configure it all",
+  "author": "I-Kail-I",
+  "license": "MIT",
+  "keywords": [],
+  "scripts": {
+    "docker:up": "docker compose up -d",
+    "docker:up-prod": "docker compose -f docker-compose.prod.yml up -d",
+    "docker:down": "docker compose down",
+    "build": "docker compose build",
+    "build-prod": "docker compose -f docker-compose.prod.yml build",
+    "build:no-cache": "docker compose build --no-cache",
+    "build:no-cache-prod": "docker compose -f docker-compose.prod.yml build --no-cache",
+    "clean": "rimraf \"**/build\" \"**/dist\" \"**/.next\" \"**/node_modules\"",
+    "clean:all": "rimraf node_modules backend/node_modules frontend/node_modules && rimraf backend/dist frontend/.next",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "format:backend": "prettier --write \"backend/**/*.{ts,js,json}\"",
+    "format:frontend": "prettier --write \"frontend/**/*.{ts,tsx,js,jsx,json}\"",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "lint:backend": "eslint \"backend/**/*.ts\"",
+    "lint:frontend": "eslint \"frontend/**/*.ts\" \"frontend/**/*.tsx\"",
+    "test": "npm run test:backend && npm run test:frontend",
+    "test:backend": "cd backend && npm test",
+    "test:frontend": "cd frontend && npm test"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^9.0.0",
+    "@next/eslint-plugin-next": "^16.2.9",
+    "rimraf": "^6.1.3"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.101.0"
+  }
+}

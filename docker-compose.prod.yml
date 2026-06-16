@@ -1,0 +1,47 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: Database_prod
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      target: prod
+    container_name: Backend_prod
+    restart: unless-stopped
+    env_file: ./backend/.env.production
+    ports:
+      - "4983:4983"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - upload_folder:/app/uploads
+
+  frontend:
+    build:
+      context: ./frontend
+      target: prod
+    container_name: Frontend_prod
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file: ./frontend/.env.production
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  upload_folder:

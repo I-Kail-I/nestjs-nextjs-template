@@ -1,0 +1,46 @@
+import antfu from "@antfu/eslint-config";
+
+export default antfu({
+  typescript: {
+    tsconfigPath: "./backend/tsconfig.json",
+  },
+  node: true,
+  stylistic: {
+    semi: true,
+    quotes: "single",
+    commaDangle: "always-multiline",
+    trailingComma: "all",
+    indent: 2,
+    arrowParens: true,
+  },
+  nextjs: true,
+  rules: {
+    "node/prefer-global/process": "off",
+    "no-restricted-globals": "off",
+    "@typescript-eslint/consistent-type-imports": "off",
+    "no-console": "off",
+    "@stylistic/brace-style": "off",
+    "eslintstyle/operator-linebreak": "off",
+    "ts/no-unsafe-argument": "warn",
+    "ts/no-floating-promises": "warn",
+    "ts/no-explicit-any": "off",
+  },
+  ignores: [
+    "**/dist/**",
+    "**/node_modules/**",
+    "eslint.config.mjs",
+    "**/*.config.js",
+    "**/*.config.ts",
+    "**/*.config.mjs",
+    "**/*.config.cjs",
+    "**/.next/**",
+    "**/out/**",
+    "**/*.json",
+    "**/*.md",
+    "**/*.yml",
+    "**/*.yaml",
+    "frontend/**/*.mjs",
+    "frontend/**/*.cjs",
+    "frontend/postcss.config.mjs",
+  ],
+});
