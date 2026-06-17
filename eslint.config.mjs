@@ -24,6 +24,7 @@ export default antfu({
     "ts/no-unsafe-argument": "warn",
     "ts/no-floating-promises": "warn",
     "ts/no-explicit-any": "off",
+    "lowercaseeslinttest/prefer-lowercase-title": "off"
   },
   ignores: [
     "**/dist/**",

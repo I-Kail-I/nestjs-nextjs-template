@@ -25,10 +25,12 @@ services:
     ports:
       - "8000:8000"
       - "4983:4983"
+    restart: unless-stopped
     volumes:
-      - ./backend/src:/app/src
+      - ./backend:/app
+      - /app/node_modules
       - upload_folder_dev:/app/uploads
-    # env_file: ./backend/.env.development
+    env_file: ./backend/.env.development
     depends_on:
       postgres:
         condition: service_healthy
@@ -45,7 +47,7 @@ services:
       - ./frontend:/app
     depends_on:
       - backend
-    # env_file: ./frontend/.env.development
+    env_file: ./frontend/.env.development
 
 volumes:
   postgres_data_dev:
