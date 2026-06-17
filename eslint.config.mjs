@@ -26,6 +26,7 @@ export default antfu({
     'ts/no-explicit-any': 'off',
     'lowercaseeslinttest/prefer-lowercase-title': 'off',
     'ts/no-floating-promises': 'off',
+    'next/no-html-link-for-pages': 'off', 
   },
   ignores: [
     '**/dist/**',

@@ -32,8 +32,8 @@ function PaginationItem({ ...props }: React.ComponentProps<'li'>) {
 
 type PaginationLinkProps = {
   isActive?: boolean;
-} & Pick<React.ComponentProps<typeof Button>, 'size'> &
-  React.ComponentProps<'a'>;
+} & Pick<React.ComponentProps<typeof Button>, 'size'>
+& React.ComponentProps<'a'>;
 
 function PaginationLink({ className, isActive, size = 'icon', ...props }: PaginationLinkProps) {
   return (
@@ -56,7 +56,7 @@ function PaginationPrevious({
   return (
     <PaginationLink
       aria-label="Go to previous page"
-      size="default"
+      size="sm"
       className={cn('pl-1.5!', className)}
       {...props}
     >
@@ -74,7 +74,7 @@ function PaginationNext({
   return (
     <PaginationLink
       aria-label="Go to next page"
-      size="default"
+      size="sm"
       className={cn('pr-1.5!', className)}
       {...props}
     >
@@ -90,7 +90,7 @@ function PaginationEllipsis({ className, ...props }: React.ComponentProps<'span'
       aria-hidden
       data-slot="pagination-ellipsis"
       className={cn(
-        "flex size-8 items-center justify-center [&_svg:not([class*='size-'])]:size-4",
+        'flex size-8 items-center justify-center [&_svg:not([class*=\'size-\'])]:size-4',
         className,
       )}
       {...props}

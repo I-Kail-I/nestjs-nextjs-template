@@ -21,4 +21,4 @@ COPY package*.json ./
 RUN npm ci --omit=dev
 COPY --from=builder /app/dist ./dist
 EXPOSE 8000
-CMD ["npm", "start:prod"]
+CMD ["npm", "run", "start:prod"]
