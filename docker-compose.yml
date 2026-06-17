@@ -8,11 +8,11 @@ services:
       POSTGRES_PASSWORD: development_db_password
       POSTGRES_DB: my_portofolio_mikail
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data_dev:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
       interval: 5s
       timeout: 5s
       retries: 5
@@ -23,8 +23,8 @@ services:
       target: dev
     container_name: Backend_dev
     ports:
-      - "8000:8000"
-      - "4983:4983"
+      - '8000:8000'
+      - '4983:4983'
     restart: unless-stopped
     volumes:
       - ./backend:/app
@@ -42,7 +42,7 @@ services:
     container_name: Frontend_dev
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - '3000:3000'
     volumes:
       - ./frontend:/app
     depends_on:

@@ -16,10 +16,7 @@ function Pagination({ className, ...props }: React.ComponentProps<'nav'>) {
   );
 }
 
-function PaginationContent({
-  className,
-  ...props
-}: React.ComponentProps<'ul'>) {
+function PaginationContent({ className, ...props }: React.ComponentProps<'ul'>) {
   return (
     <ul
       data-slot="pagination-content"
@@ -35,22 +32,12 @@ function PaginationItem({ ...props }: React.ComponentProps<'li'>) {
 
 type PaginationLinkProps = {
   isActive?: boolean;
-} & Pick<React.ComponentProps<typeof Button>, 'size'>
-& React.ComponentProps<'a'>;
+} & Pick<React.ComponentProps<typeof Button>, 'size'> &
+  React.ComponentProps<'a'>;
 
-function PaginationLink({
-  className,
-  isActive,
-  size = 'icon',
-  ...props
-}: PaginationLinkProps) {
+function PaginationLink({ className, isActive, size = 'icon', ...props }: PaginationLinkProps) {
   return (
-    <Button
-      asChild
-      variant={isActive ? 'outline' : 'ghost'}
-      size={size}
-      className={cn(className)}
-    >
+    <Button asChild variant={isActive ? 'outline' : 'ghost'} size={size} className={cn(className)}>
       <a
         aria-current={isActive ? 'page' : undefined}
         data-slot="pagination-link"
@@ -97,16 +84,13 @@ function PaginationNext({
   );
 }
 
-function PaginationEllipsis({
-  className,
-  ...props
-}: React.ComponentProps<'span'>) {
+function PaginationEllipsis({ className, ...props }: React.ComponentProps<'span'>) {
   return (
     <span
       aria-hidden
       data-slot="pagination-ellipsis"
       className={cn(
-        'flex size-8 items-center justify-center [&_svg:not([class*=\'size-\'])]:size-4',
+        "flex size-8 items-center justify-center [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       {...props}
