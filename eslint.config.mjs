@@ -27,8 +27,8 @@ export default antfu({
     'lowercaseeslinttest/prefer-lowercase-title': 'off',
     'ts/no-floating-promises': 'off',
     'next/no-html-link-for-pages': 'off',
-    "eslintstyle/operator-linebreak": "off",
-    "found.eslintstyle/quote-props": "off"
+    'eslintstyle/operator-linebreak': 'off',
+    'found.eslintstyle/quote-props': 'off',
   },
   ignores: [
     '**/dist/**',
