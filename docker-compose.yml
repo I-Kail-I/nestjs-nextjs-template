@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: development_db_password
-      POSTGRES_DB: my_portofolio_mikail
+      POSTGRES_DB: database
     ports:
       - '5432:5432'
     volumes:
@@ -30,7 +30,7 @@ services:
       - ./backend:/app
       - /app/node_modules
       - upload_folder_dev:/app/uploads
-    env_file: ./backend/.env.development
+    env_file: ./backend/.env
     depends_on:
       postgres:
         condition: service_healthy
@@ -47,7 +47,7 @@ services:
       - ./frontend:/app
     depends_on:
       - backend
-    env_file: ./frontend/.env.development
+    env_file: ./frontend/.env
 
 volumes:
   postgres_data_dev:
