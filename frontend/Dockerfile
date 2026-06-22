@@ -6,7 +6,7 @@ WORKDIR /app
 # DEVELOPMENT
 FROM base AS dev
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 ENV NODE_ENV=development
 ENV NEXT_TELEMETRY_DISABLED=1
 EXPOSE 3000

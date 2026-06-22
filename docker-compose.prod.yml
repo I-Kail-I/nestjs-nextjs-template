@@ -21,7 +21,7 @@ services:
       target: prod
     container_name: Backend_prod
     restart: unless-stopped
-    env_file: ./backend/.env.production
+    env_file: ./backend/.env
     ports:
       - "4983:4983"
     depends_on:
@@ -38,7 +38,7 @@ services:
     restart: unless-stopped
     ports:
       - "3000:3000"
-    env_file: ./frontend/.env.production
+    env_file: ./frontend/.env
     depends_on:
       - backend
 

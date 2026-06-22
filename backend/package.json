@@ -8,9 +8,9 @@
   "scripts": {
     "build": "npm run db:generate && nest build",
     "start": "nest start",
-    "start:dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/main.ts",
+    "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node -r tsconfig-paths/register dist/src/main.js",
+    "start:prod": "node dist/main",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
@@ -23,31 +23,25 @@
     "db:push": "prisma db push"
   },
   "dependencies": {
-    "@better-auth/prisma-adapter": "^1.6.20",
     "@nestjs/common": "^11.0.1",
-    "@nestjs/config": "^4.0.4",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
-    "@nestjs/swagger": "^11.4.4",
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
-    "@thallesp/nestjs-better-auth": "^2.6.1",
     "bcryptjs": "^3.0.3",
     "better-auth": "^1.6.20",
-    "class-transformer": "^0.5.1",
-    "class-validator": "^0.15.1",
     "dotenv": "^17.4.2",
-    "nestjs-pino": "^4.6.1",
+    "helmet": "^8.2.0",
     "pg": "^8.22.0",
-    "pino": "^10.3.1",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1",
-    "tsconfig-paths": "^4.2.0"
+    "rxjs": "^7.8.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.1",
+    "@swc/cli": "^0.8.1",
+    "@swc/core": "^1.15.41",
     "@types/express": "^5.0.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.0.0",
@@ -57,10 +51,31 @@
     "prisma": "^7.8.0",
     "source-map-support": "^0.5.21",
     "supertest": "^7.0.0",
+    "swc-loader": "^0.2.7",
     "ts-jest": "^29.2.5",
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
-    "ts-node-dev": "^2.0.0",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.3"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": "src",
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "collectCoverageFrom": [
+      "**/*.(t|j)s"
+    ],
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/$1"
+    }
   }
 }

@@ -8,9 +8,7 @@
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "paths": {
-      "@/*": ["./src/*"],
-      "@modules/*": ["./src/modules/*"],
-      "@common/*": ["./src/common/*"]
+      "@/*": ["./src/*"]
     },
     "resolvePackageJsonExports": true,
     "types": ["jest", "node"],

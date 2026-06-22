@@ -41,7 +41,7 @@ model Account {
   userId            String
   user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   providerId        String
-  providerAccountId String
+  providerAccountId String?
   scope             String?
   accessToken       String?
   refreshToken      String?

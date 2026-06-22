@@ -29,7 +29,8 @@ export default antfu({
     'next/no-html-link-for-pages': 'off',
     'eslintstyle/operator-linebreak': 'off',
     'found.eslintstyle/quote-props': 'off',
-    "variableeslintnext/no-assign-module-variable": "off"
+    'variableeslintnext/no-assign-module-variable': 'off',
+    'eslintperfectionist/sort-imports': 'off',
   },
   ignores: [
     '**/dist/**',
