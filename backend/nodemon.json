@@ -1,0 +1,7 @@
+{
+  "watch": ["src"],
+  "ext": "ts",
+  "ignore": ["src/**/*.spec.ts"],
+  "exec": "ts-node --project tsconfig.json --swc -r tsconfig-paths/register src/main.ts",
+  "delay": 200
+}
