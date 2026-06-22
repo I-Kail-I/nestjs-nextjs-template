@@ -34,7 +34,11 @@ export default antfu({
     'eslintts/strict-boolean-expressions': 'off',
     'eslintnode/prefer-global/buffer': 'off',
     'eslintts/strict-boolean-expressions': 'off',
-    'eslintstyle/quote-props': 'off'
+    'eslintstyle/quote-props': 'off',
+    'eslintstyle/operator-linebreak': 'off',
+    'style/quote-props': 'off',
+    'style/operator-linebreak': 'off',
+    'style/indent-binary-ops': 'off'
   },
   ignores: [
     '**/dist/**',
@@ -53,7 +57,7 @@ export default antfu({
     'frontend/**/*.mjs',
     'frontend/**/*.cjs',
     'frontend/postcss.config.mjs',
-    '**/prisma/**/*', 
+    '**/prisma/**/*',
     '**/*.toml',
     '**/*.json',
     '**/*.md',
