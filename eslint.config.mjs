@@ -31,9 +31,10 @@ export default antfu({
     'found.eslintstyle/quote-props': 'off',
     'variableeslintnext/no-assign-module-variable': 'off',
     'perfectionist/sort-imports': 'off',
-    "eslintts/strict-boolean-expressions": "off",
-    "eslintnode/prefer-global/buffer": "off",
-    "eslintts/strict-boolean-expressions": "off"
+    'eslintts/strict-boolean-expressions': 'off',
+    'eslintnode/prefer-global/buffer': 'off',
+    'eslintts/strict-boolean-expressions': 'off',
+    'eslintstyle/quote-props': 'off'
   },
   ignores: [
     '**/dist/**',
@@ -52,5 +53,9 @@ export default antfu({
     'frontend/**/*.mjs',
     'frontend/**/*.cjs',
     'frontend/postcss.config.mjs',
+    '**/prisma/**/*', 
+    '**/*.toml',
+    '**/*.json',
+    '**/*.md',
   ],
 });
