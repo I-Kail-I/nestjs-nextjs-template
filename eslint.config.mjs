@@ -30,7 +30,10 @@ export default antfu({
     'eslintstyle/operator-linebreak': 'off',
     'found.eslintstyle/quote-props': 'off',
     'variableeslintnext/no-assign-module-variable': 'off',
-    'eslintperfectionist/sort-imports': 'off',
+    'perfectionist/sort-imports': 'off',
+    "eslintts/strict-boolean-expressions": "off",
+    "eslintnode/prefer-global/buffer": "off",
+    "eslintts/strict-boolean-expressions": "off"
   },
   ignores: [
     '**/dist/**',
