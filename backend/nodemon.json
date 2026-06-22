@@ -2,6 +2,6 @@
   "watch": ["src"],
   "ext": "ts",
   "ignore": ["src/**/*.spec.ts"],
-  "exec": "tsx src/main.ts",
+  "exec": "tsx watch src/main.ts",
   "delay": 200
 }
