@@ -9,6 +9,8 @@ services:
       POSTGRES_DB: ${DB_NAME}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-networks
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME}"]
       interval: 5s
@@ -23,10 +25,12 @@ services:
     restart: unless-stopped
     env_file: ./backend/.env
     depends_on:
-      postgres:
+      database:
         condition: service_healthy
     volumes:
       - upload_folder:/app/uploads
+    networks:
+      - app-networks
 
   frontend:
     build:
@@ -34,11 +38,29 @@ services:
       target: prod
     container_name: Frontend_prod
     restart: unless-stopped
-    ports:
-      - "3000:3000"
     env_file: ./frontend/.env
     depends_on:
       - backend
+    networks:
+      - app-networks
+
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+    container_name: Nginx_prod
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - app-networks  # ← THIS WAS MISSING!
+
+networks:
+  app-networks:
+    driver: bridge
 
 volumes:
   postgres_data:

@@ -6,12 +6,12 @@
   "license": "MIT",
   "keywords": [],
   "scripts": {
-    "docker:up": "docker compose up -d",
+    "dev": "concurrently --names \"BACKEND,FRONTEND\" --prefix-colors \"blue,green\" \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run start:dev",
+    "dev:frontend": "cd frontend && npm run dev",
     "docker:up-prod": "docker compose -f docker-compose.prod.yml up -d",
     "docker:down": "docker compose down",
-    "build": "docker compose build",
     "build-prod": "docker compose -f docker-compose.prod.yml build",
-    "build:no-cache": "docker compose build --no-cache",
     "build:no-cache-prod": "docker compose -f docker-compose.prod.yml build --no-cache",
     "clean": "rimraf \"**/build\" \"**/dist\" \"**/.next\" \"**/node_modules\"",
     "clean:all": "rimraf node_modules backend/node_modules frontend/node_modules && rimraf backend/dist frontend/.next",
@@ -30,6 +30,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^9.0.0",
     "@next/eslint-plugin-next": "^16.2.9",
+    "concurrently": "^10.0.3",
     "prettier": "^3.8.4",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "rimraf": "^6.1.3"
