@@ -10,7 +10,7 @@
     "dev:backend": "cd backend && npm run start:dev",
     "dev:frontend": "cd frontend && npm run dev",
     "docker:up-prod": "docker compose -f docker-compose.prod.yml up -d",
-    "docker:down": "docker compose down",
+    "docker:down": "docker compose -f docker-compose.prod.yml down",
     "build-prod": "docker compose -f docker-compose.prod.yml build",
     "build:no-cache-prod": "docker compose -f docker-compose.prod.yml build --no-cache",
     "clean": "rimraf \"**/build\" \"**/dist\" \"**/.next\" \"**/node_modules\"",
