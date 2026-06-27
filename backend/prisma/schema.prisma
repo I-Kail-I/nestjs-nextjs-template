@@ -14,12 +14,13 @@ model User {
   email         String    @unique
   emailVerified Boolean   @default(false)
   name          String?
+  password      String
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
 
-  @@index([email])
+  @@index([email, name])
   @@map("users")
   @@schema("auth")
 }

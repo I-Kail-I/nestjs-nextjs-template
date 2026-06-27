@@ -7,6 +7,7 @@ CREATE TABLE "auth"."users" (
     "email" TEXT NOT NULL,
     "emailVerified" BOOLEAN NOT NULL DEFAULT false,
     "name" TEXT,
+    "password" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -29,7 +30,7 @@ CREATE TABLE "auth"."accounts" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "providerId" TEXT NOT NULL,
-    "providerAccountId" TEXT NOT NULL,
+    "providerAccountId" TEXT,
     "scope" TEXT,
     "accessToken" TEXT,
     "refreshToken" TEXT,
@@ -55,7 +56,7 @@ CREATE TABLE "auth"."verifications" (
 CREATE UNIQUE INDEX "users_email_key" ON "auth"."users"("email");
 
 -- CreateIndex
-CREATE INDEX "users_email_idx" ON "auth"."users"("email");
+CREATE INDEX "users_email_name_idx" ON "auth"."users"("email", "name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "accounts_providerId_providerAccountId_key" ON "auth"."accounts"("providerId", "providerAccountId");
