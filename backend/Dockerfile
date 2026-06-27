@@ -3,13 +3,6 @@ FROM node:24-slim AS base
 USER root
 WORKDIR /app
 
-FROM base AS dev
-COPY package*.json ./
-RUN npm ci
-COPY . ./
-EXPOSE 8000
-CMD ["npm", "run", "start:dev"]
-
 FROM base AS builder
 COPY package*.json ./
 RUN npm ci

@@ -1,5 +1,5 @@
 services:
-  postgres:
+  database:
     image: postgres:17-alpine
     container_name: Database_dev
     restart: unless-stopped
@@ -16,38 +16,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-
-  backend:
-    build:
-      context: ./backend
-      target: dev
-    container_name: Backend_dev
-    ports:
-      - "8000:8000"
-      - "4983:4983"
-    restart: unless-stopped
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
-      - upload_folder_dev:/app/uploads
-    env_file: ./backend/.env
-    depends_on:
-      postgres:
-        condition: service_healthy
-
-  frontend:
-    build:
-      context: ./frontend
-      target: dev
-    container_name: Frontend_dev
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./frontend:/app
-    depends_on:
-      - backend
-    env_file: ./frontend/.env
 
 volumes:
   postgres_data_dev:

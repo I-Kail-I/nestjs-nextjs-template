@@ -1,6 +1,6 @@
 services:
-  postgres:
-    image: postgres:17-alpine
+  database:
+    image: postgres:17
     container_name: Database_prod
     restart: unless-stopped
     environment:
@@ -22,8 +22,6 @@ services:
     container_name: Backend_prod
     restart: unless-stopped
     env_file: ./backend/.env
-    ports:
-      - "4983:4983"
     depends_on:
       postgres:
         condition: service_healthy
