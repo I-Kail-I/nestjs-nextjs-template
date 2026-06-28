@@ -6,9 +6,6 @@ services:
     container_name: Backend_prod
     restart: unless-stopped
     env_file: ./backend/.env
-    depends_on:
-      database:
-        condition: service_healthy
     volumes:
       - upload_folder:/app/uploads
     logging:
@@ -17,7 +14,7 @@ services:
         max-size: "10m"
         max-file: "3"
     environment:
-      - PORT=${PORT}
+      - PORT=${BACKEND_PORT}
       - DATABASE_URL=${DATABASE_URL}
       - BETTER_AUTH_URL=${BETTER_AUTH_URL}
       - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
@@ -42,7 +39,7 @@ services:
     environment:
       - API_URL=${API_URL}
       - NEXT_PUBLIC_API_PREFIX=${NEXT_PUBLIC_API_PREFIX}
-      - PORT=${PORT}
+      - PORT=${FRONTEND_PORT}
       - NODE_ENV=${NODE_ENV}
 
 volumes:
