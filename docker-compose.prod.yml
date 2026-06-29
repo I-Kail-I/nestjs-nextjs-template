@@ -5,7 +5,6 @@ services:
       target: prod
     container_name: Backend_prod
     restart: unless-stopped
-    env_file: ./backend/.env
     volumes:
       - upload_folder:/app/uploads
     logging:
@@ -28,7 +27,8 @@ services:
       target: prod
     container_name: Frontend_prod
     restart: unless-stopped
-    env_file: ./frontend/.env
+    ports:
+      - "3000:3000"
     depends_on:
       - backend
     logging:
@@ -43,5 +43,4 @@ services:
       - NODE_ENV=${NODE_ENV}
 
 volumes:
-  postgres_data:
   upload_folder:
