@@ -15,7 +15,6 @@ services:
     environment:
       - PORT=${BACKEND_PORT}
       - DATABASE_URL=${DATABASE_URL}
-      - BETTER_AUTH_URL=${BETTER_AUTH_URL}
       - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
       - NODE_ENV=${NODE_ENV}
       - FRONTEND_URL=${FRONTEND_URL}
