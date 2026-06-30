@@ -38,7 +38,7 @@ export default antfu({
     'eslintstyle/operator-linebreak': 'off',
     'style/quote-props': 'off',
     'style/operator-linebreak': 'off',
-    'style/indent-binary-ops': 'off'
+    'style/indent-binary-ops': 'off',
   },
   ignores: [
     '**/dist/**',
