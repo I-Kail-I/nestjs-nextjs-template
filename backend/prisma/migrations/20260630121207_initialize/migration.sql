@@ -7,7 +7,6 @@ CREATE TABLE "auth"."users" (
     "email" TEXT NOT NULL,
     "emailVerified" BOOLEAN NOT NULL DEFAULT false,
     "name" TEXT,
-    "password" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -18,6 +17,9 @@ CREATE TABLE "auth"."users" (
 CREATE TABLE "auth"."sessions" (
     "id" TEXT NOT NULL,
     "expiresAt" TIMESTAMP(3) NOT NULL,
+    "token" TEXT NOT NULL,
+    "ipAddress" TEXT,
+    "userAgent" TEXT,
     "userId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -30,12 +32,15 @@ CREATE TABLE "auth"."accounts" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "providerId" TEXT NOT NULL,
+    "accountId" TEXT NOT NULL,
     "providerAccountId" TEXT,
     "scope" TEXT,
     "accessToken" TEXT,
     "refreshToken" TEXT,
     "expiresAt" TIMESTAMP(3),
     "password" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "accounts_pkey" PRIMARY KEY ("id")
 );
@@ -57,6 +62,9 @@ CREATE UNIQUE INDEX "users_email_key" ON "auth"."users"("email");
 
 -- CreateIndex
 CREATE INDEX "users_email_name_idx" ON "auth"."users"("email", "name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "sessions_token_key" ON "auth"."sessions"("token");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "accounts_providerId_providerAccountId_key" ON "auth"."accounts"("providerId", "providerAccountId");
