@@ -1,0 +1,36 @@
+{
+  "name": "template",
+  "version": "1.0.0",
+  "description": "",
+  "author": "I-Kail-I",
+  "license": "MIT",
+  "scripts": {
+    "dev": "concurrently --names \"BACKEND,FRONTEND\" --prefix-colors \"blue,green\" \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run start:dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "docker:up-prod": "docker compose -f docker-compose.prod.yml up -d",
+    "docker:down": "docker compose -f docker-compose.prod.yml down",
+    "build-prod": "docker compose -f docker-compose.prod.yml build",
+    "build:no-cache-prod": "docker compose -f docker-compose.prod.yml build --no-cache",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "format:backend": "prettier --write \"backend/**/*.{ts,js,json}\"",
+    "format:frontend": "prettier --write \"frontend/**/*.{ts,tsx,js,jsx,json}\"",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "lint:backend": "eslint \"backend/**/*.ts\"",
+    "lint:frontend": "eslint \"frontend/**/*.ts\" \"frontend/**/*.tsx\"",
+    "test": "npm run test:backend && npm run test:frontend",
+    "test:backend": "cd backend && npm test",
+    "test:frontend": "cd frontend && npm test"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^9.1.0",
+    "@eslint-react/eslint-plugin": "^5.12.0",
+    "concurrently": "^10.0.3",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react-refresh": "^0.5.3",
+    "prettier": "^3.9.4",
+    "prettier-plugin-tailwindcss": "^0.8.0"
+  }
+}
