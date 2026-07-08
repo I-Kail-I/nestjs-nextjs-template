@@ -5,7 +5,7 @@
   "author": "I-Kail-I",
   "license": "MIT",
   "scripts": {
-    "install:all": "npm ci && cd backend && npm ci && cd ../frontend && npm ci",
+    "install:all": "npm ci && concurrently \"npm ci --cwd backend\" \"npm ci --cwd frontend\"",
     "dev": "concurrently --names \"BACKEND,FRONTEND\" --prefix-colors \"blue,green\" \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:backend": "cd backend && npm run start:dev",
     "dev:frontend": "cd frontend && npm run dev",
