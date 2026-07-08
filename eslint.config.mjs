@@ -10,6 +10,9 @@ export default antfu(
     react: true,
     typescript: {
       tsconfigPath: './tsconfig.json',
+      parserOptions: {
+        projectService: {},
+      },
       overridesTypeChecked: {
         'ts/no-floating-promises': 'error',
         'ts/no-misused-promises': 'error',
