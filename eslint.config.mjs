@@ -27,6 +27,8 @@ export default antfu(
       'style/quote-props': 'off',
       'antfu/if-newline': 'off',
       'react-refresh/only-export-components': 'off',
+      'test/prefer-lowercase-title': 'off',
+      'yaml/flow-mapping-curly-spacing': 'off',
     },
   },
   {
