@@ -10,6 +10,9 @@ export default antfu(
     react: true,
     typescript: {
       tsconfigPath: './tsconfig.json',
+      parserOptions: {
+        projectService: {},
+      },
       overridesTypeChecked: {
         'ts/no-floating-promises': 'error',
         'ts/no-misused-promises': 'error',
@@ -27,6 +30,8 @@ export default antfu(
       'style/quote-props': 'off',
       'antfu/if-newline': 'off',
       'react-refresh/only-export-components': 'off',
+      'test/prefer-lowercase-title': 'off',
+      'yaml/flow-mapping-curly-spacing': 'off',
     },
   },
   {
