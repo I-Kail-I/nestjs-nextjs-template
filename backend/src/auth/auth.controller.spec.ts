@@ -3,7 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 
-jest.mock('@/prisma/prisma.service', () => ({
+jest.mock('@/common/prisma/prisma.service', () => ({
   PrismaService: jest.fn().mockImplementation(() => ({
     user: {
       findUnique: jest.fn(),
