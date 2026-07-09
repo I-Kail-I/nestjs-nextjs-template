@@ -41,6 +41,13 @@ export default antfu(
     },
   },
   {
+    files: ['**/*.spec.ts', '**/*.spec.tsx', '**/*.test.ts', '**/*.test.tsx'],
+    rules: {
+      'ts/no-unsafe-call': 'off',
+      'ts/no-unsafe-member-access': 'off',
+    },
+  },
+  {
     ignores: ['**/generated/**', '**/node_modules/**', '**/dist/**', '**/.git/**'],
   },
 );
