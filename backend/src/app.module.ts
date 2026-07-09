@@ -5,6 +5,7 @@ import { LoggerModule } from 'nestjs-pino';
 import { AuthModule } from './auth/auth.module';
 import { MorganMiddleware } from './common/middleware/morgan.middleware';
 import { PrismaModule } from './common/prisma/prisma.module';
+import { HealthController } from './health/health.controller';
 import { isProduction } from './utils/check-env';
 
 @Module({
@@ -44,6 +45,7 @@ import { isProduction } from './utils/check-env';
       useClass: ThrottlerGuard,
     },
   ],
+  controllers: [HealthController],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
