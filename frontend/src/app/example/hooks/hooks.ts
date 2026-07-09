@@ -9,8 +9,7 @@ export async function fetchUser(): Promise<UserDto> {
     const validatedUser = UserSchema.parse(response.data);
 
     return validatedUser;
-  }
-  catch (error: unknown) {
+  } catch (error: unknown) {
     console.error('Failed to fetch or validate user:', error);
     throw error;
   }

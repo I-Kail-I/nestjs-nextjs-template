@@ -115,6 +115,7 @@ export default antfu(
     files: ['**/*.yml', '**/*.yaml'],
     rules: {
       'yaml/quotes': 'off',
+      'yaml/plain-scalar': 'off',
     },
   },
   // ===== IGNORES =====

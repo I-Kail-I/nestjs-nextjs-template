@@ -2,13 +2,20 @@
 import 'dotenv/config';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
-import morgan from 'morgan';
-import { AppModule } from './app.module';
+import { AppModule } from '@/app.module';
+import { Logger } from 'nestjs-pino';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    bufferLogs: true,
+  });
+
   const PORT: number = Number(process.env.PORT ?? 8000);
+
+  app.useLogger(app.get(Logger));
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -27,8 +34,17 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
   app.use(helmet());
+  app.use(cookieParser());
 
-  app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+  const config = new DocumentBuilder()
+    .setTitle('My API')
+    .setDescription('API description')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/docs', app, document);
 
   await app.listen(PORT);
   console.log(`Server is running on port ${PORT}`);

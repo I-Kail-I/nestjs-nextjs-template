@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono, Inter } from 'next/font/google';
+import { Providers } from '@/components/provider';
 import { cn } from '@/lib/utils';
 import './globals.css';
 
@@ -37,7 +38,9 @@ export default function RootLayout({
         inter.variable,
       )}
     >
-      <body className="flex min-h-full flex-col">{children}</body>
+      <Providers>
+        <body className="flex min-h-full flex-col">{children}</body>
+      </Providers>
     </html>
   );
 }
