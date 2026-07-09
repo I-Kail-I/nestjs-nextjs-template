@@ -5,11 +5,6 @@ import {
   MinLength,
 } from 'class-validator';
 
-export enum UserRole {
-  ADMIN = 'admin',
-  USER = 'user',
-}
-
 export class CreateAuthDto {
   @IsString()
   @IsNotEmpty()

@@ -6,8 +6,8 @@
   "license": "MIT",
   "scripts": {
     "dev": "concurrently --names \"BACKEND,FRONTEND\" --prefix-colors \"blue,green\" \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "dev:backend": "cd backend && npm run start:dev",
-    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "npm --prefix backend run start:dev",
+    "dev:frontend": "npm --prefix frontend run dev",
     "docker:up-prod": "docker compose -f docker-compose.prod.yml up -d",
     "docker:down": "docker compose -f docker-compose.prod.yml down",
     "build-prod": "docker compose -f docker-compose.prod.yml build",
@@ -21,8 +21,8 @@
     "lint:backend": "eslint \"backend/**/*.ts\"",
     "lint:frontend": "eslint \"frontend/**/*.ts\" \"frontend/**/*.tsx\"",
     "test": "npm run test:backend && npm run test:frontend",
-    "test:backend": "cd backend && npm test",
-    "test:frontend": "cd frontend && npm test"
+    "test:backend": "npm --prefix backend test",
+    "test:frontend": "npm --prefix frontend test"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^9.1.0",

@@ -2,7 +2,7 @@ import type { UserDto } from '../user.dto';
 import { axiosInstance } from '@/lib/axios';
 import { UserSchema } from '../user.dto';
 
-export async function gettingUser(): Promise<UserDto> {
+export async function fetchUser(): Promise<UserDto> {
   try {
     const response = await axiosInstance.get('/user');
 

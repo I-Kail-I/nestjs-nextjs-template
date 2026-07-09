@@ -13,11 +13,6 @@ jest.mock('@/prisma/prisma.service', () => ({
   })),
 }));
 
-jest.mock('bcryptjs', () => ({
-  hash: jest.fn(),
-  compare: jest.fn(),
-}));
-
 describe('AuthController', () => {
   let controller: AuthController;
 
