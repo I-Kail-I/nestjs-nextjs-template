@@ -3,17 +3,6 @@ name: Run Tests
 on: [push, pull_request]
 
 jobs:
-  root:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24.15.0
-          cache: npm
-          cache-dependency-path: package-lock.json
-      - run: npm ci
-
   backend:
     runs-on: ubuntu-latest
     steps:
@@ -23,6 +12,7 @@ jobs:
           node-version: 24.15.0
           cache: npm
           cache-dependency-path: backend/package-lock.json
+      - run: npm ci
       - run: cd backend && npm ci
       - run: cd backend && npm run lint
       - run: cd backend && npm test
@@ -36,6 +26,7 @@ jobs:
           node-version: 24.15.0
           cache: npm
           cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
       - run: cd frontend && npm ci
       - run: cd frontend && npm run lint
       - run: cd frontend && npm test
