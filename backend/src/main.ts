@@ -7,7 +7,7 @@ import helmet from 'helmet';
 import { AppModule } from '@/app.module';
 import { Logger } from 'nestjs-pino';
 import cookieParser from 'cookie-parser';
-import { isDevelopmen } from './utils/check-env';
+import { isDevelopment } from './utils/check-env';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -37,7 +37,7 @@ async function bootstrap() {
   app.use(helmet());
   app.use(cookieParser());
 
-  if (isDevelopmen) {
+  if (isDevelopment) {
     const config = new DocumentBuilder()
       .setTitle('My API')
       .setDescription('API description')
