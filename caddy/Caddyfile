@@ -1,0 +1,9 @@
+{$DOMAIN:localhost} {
+    handle /api/* {
+        reverse_proxy backend:{$BACKEND_PORT:8000}
+    }
+
+    handle {
+        reverse_proxy frontend:{$FRONTEND_PROT:3000} 
+    }
+}

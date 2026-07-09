@@ -1,4 +1,32 @@
 services:
+  caddy:
+    build:
+      context: ./caddy
+      dockerfile: Dockerfile
+    container_name: Caddy_prod
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+    environment:
+      - DOMAIN=${DOMAIN}
+      - BACKEND_PORT=${BACKEND_PORT}
+      - FRONTEND_PORT=${FRONTEND_PORT}
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      backend:
+        condition: service_healthy
+      frontend:
+        condition: service_started
+
   backend:
     build:
       context: ./backend
@@ -18,7 +46,7 @@ services:
       - FRONTEND_URL=${FRONTEND_URL}
       - REDIS_URL=${REDIS_URL}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:{BACKEND_PORT}/api/health"]
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:' + process.env.PORT + '/api/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
       interval: 30s
       timeout: 3s
       retries: 3
@@ -30,8 +58,6 @@ services:
       target: prod
     container_name: Frontend_prod
     restart: unless-stopped
-    ports:
-      - "3000:3000"
     depends_on:
       - backend
     logging:
@@ -44,3 +70,7 @@ services:
       - NEXT_PUBLIC_API_PREFIX=${NEXT_PUBLIC_API_PREFIX}
       - PORT=${FRONTEND_PORT}
       - NODE_ENV=${NODE_ENV}
+
+volumes:
+  caddy_data:
+  caddy_config:
