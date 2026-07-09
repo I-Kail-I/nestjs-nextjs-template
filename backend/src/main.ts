@@ -6,6 +6,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { AppModule } from '@/app.module';
 import { Logger } from 'nestjs-pino';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -33,6 +34,7 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
   app.use(helmet());
+  app.use(cookieParser());
 
   const config = new DocumentBuilder()
     .setTitle('My API')
