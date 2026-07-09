@@ -8,6 +8,8 @@ FROM base AS builder
 COPY package*.json ./
 RUN npm install
 COPY . .
+ENV next_telemetry_disabled=1
+ENV NODE_ENV=production
 RUN npm run build
 
 # PRODUCTION
