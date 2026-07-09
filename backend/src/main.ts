@@ -7,6 +7,7 @@ import helmet from 'helmet';
 import { AppModule } from '@/app.module';
 import { Logger } from 'nestjs-pino';
 import cookieParser from 'cookie-parser';
+import { isDevelopmen } from './utils/check-env';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -36,15 +37,17 @@ async function bootstrap() {
   app.use(helmet());
   app.use(cookieParser());
 
-  const config = new DocumentBuilder()
-    .setTitle('My API')
-    .setDescription('API description')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
+  if (isDevelopmen) {
+    const config = new DocumentBuilder()
+      .setTitle('My API')
+      .setDescription('API description')
+      .setVersion('1.0')
+      .addBearerAuth()
+      .build();
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document);
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api/docs', app, document);
+  }
 
   await app.listen(PORT);
   console.log(`Server is running on port ${PORT}`);
