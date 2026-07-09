@@ -1,10 +1,10 @@
 /* eslint-disable perfectionist/sort-imports */
 import 'dotenv/config';
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import helmet from 'helmet';
-import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
 import morgan from 'morgan';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

@@ -16,8 +16,7 @@ services:
     image: redis:7-alpine@sha256:c9d92d840fd011c908f040592857c724ae6d877f2aba5c40ad963276507386b2
     container_name: Cache_dev
     restart: unless-stopped
-    environment:
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    command: redis-server --requirepass ${REDIS_PASSWORD:-redis_dev_pass}
     ports:
       - '6379:6379'
     volumes:

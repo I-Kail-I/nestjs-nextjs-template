@@ -35,7 +35,7 @@ export default antfu(
     },
   },
   {
-    files: ['apps/backend/**/*.ts', 'server/**/*.ts', 'backend/**/*.ts'],
+    files: ['backend/**/*.ts'],
     rules: {
       'ts/consistent-type-imports': 'off',
     },

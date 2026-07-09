@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
-import { gettingUser } from './hooks';
+import { fetchUser } from './hooks';
 
 export function useUser() {
   return useQuery({
     queryKey: ['user'],
-    queryFn: gettingUser,
+    queryFn: fetchUser,
     staleTime: 1000 * 60 * 5,
   });
 }
