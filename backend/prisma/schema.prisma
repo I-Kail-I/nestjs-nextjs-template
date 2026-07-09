@@ -24,7 +24,7 @@ model User {
   role       Role     @default(user)
   is_active  Boolean  @default(true)
   created_at DateTime @default(now())
-  updated_at DateTime @default(now())
+  updated_at DateTime 
 
   @@map("users")
   @@schema("auth")

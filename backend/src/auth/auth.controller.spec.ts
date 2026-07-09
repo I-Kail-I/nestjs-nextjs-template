@@ -3,7 +3,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 
-// 🛑 Global mocks must be at the top
 jest.mock('@/prisma/prisma.service', () => ({
   PrismaService: jest.fn().mockImplementation(() => ({
     user: {
