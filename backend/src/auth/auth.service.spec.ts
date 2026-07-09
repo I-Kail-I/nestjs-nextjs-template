@@ -1,7 +1,8 @@
 import { ConflictException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import bcrypt from 'bcryptjs';
-import { PrismaService } from '@/prisma/prisma.service';
+import { hashPassword } from '@/lib/bcrypt';
+import { PrismaService } from '../common/prisma/prisma.service';
 import { AuthService } from './auth.service';
 
 jest.mock('@/prisma/prisma.service', () => ({
@@ -77,7 +78,7 @@ describe('AuthService', () => {
         first_name: dto.first_name,
         last_name: dto.last_name,
       });
-      expect(bcrypt.hash).toHaveBeenCalledWith(dto.password, 12);
+      expect(hashPassword).toHaveBeenCalledWith(dto.password);
 
       expect(jest.spyOn(prisma.user, 'create')).toHaveBeenCalledWith({
         data: { ...dto, password: 'hashed-password' },

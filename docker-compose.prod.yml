@@ -9,11 +9,11 @@ services:
       driver: json-file
       options:
         max-size: 10m
-        max-file: '3'
+        max-file: "3"
     environment:
       - PORT=${BACKEND_PORT}
       - DATABASE_URL=${DATABASE_URL}
-      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
+      - JWT_SECRET=${JWT_SECRET}
       - NODE_ENV=${NODE_ENV}
       - FRONTEND_URL=${FRONTEND_URL}
       - REDIS_URL=${REDIS_URL}
@@ -25,14 +25,14 @@ services:
     container_name: Frontend_prod
     restart: unless-stopped
     ports:
-      - '3000:3000'
+      - "3000:3000"
     depends_on:
       - backend
     logging:
       driver: json-file
       options:
         max-size: 10m
-        max-file: '3'
+        max-file: "3"
     environment:
       - API_URL=${API_URL}
       - NEXT_PUBLIC_API_PREFIX=${NEXT_PUBLIC_API_PREFIX}

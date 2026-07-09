@@ -5,8 +5,8 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import bcrypt from 'bcryptjs';
-import { PrismaService } from '@/prisma/prisma.service';
+import { comparePassword, hashPassword } from '@/lib/bcrypt';
+import { PrismaService } from '../common/prisma/prisma.service';
 import { CreateAuthDto, LoginDto } from './dto/create-auth.dto';
 
 @Injectable()
@@ -26,9 +26,7 @@ export class AuthService {
   }
 
   async register(createAuthDto: CreateAuthDto): Promise<Omit<User, 'password'>> {
-    const SALT_ROUNDS = 12;
-
-    const hashPassword = await bcrypt.hash(createAuthDto.password, SALT_ROUNDS);
+    const hashedPassword = await hashPassword(createAuthDto.password);
 
     const checkEmail = await this.prisma.user.findUnique({
       where: { email: createAuthDto.email },
@@ -39,7 +37,7 @@ export class AuthService {
     }
 
     const user = await this.prisma.user.create({
-      data: { ...createAuthDto, password: hashPassword },
+      data: { ...createAuthDto, password: hashedPassword },
       omit: { password: true },
     });
 
@@ -49,7 +47,7 @@ export class AuthService {
   async login(loginDto: LoginDto): Promise<Omit<User, 'password'>> {
     const user = await this.findOne(loginDto.email);
 
-    const checkPassword = await bcrypt.compare(loginDto.password, user.password);
+    const checkPassword = await comparePassword(loginDto.password, user.password);
 
     if (!checkPassword) {
       throw new UnauthorizedException('Password is incorrect');
