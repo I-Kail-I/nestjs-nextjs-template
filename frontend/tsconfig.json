@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "incremental": true,
+    "composite": true,
     "target": "ES2017",
     "jsx": "react-jsx",
     "lib": ["dom", "dom.iterable", "esnext"],
@@ -10,6 +11,7 @@
       "@/*": ["./src/*"]
     },
     "resolveJsonModule": true,
+    "types": ["jest", "@testing-library/jest-dom"],
     "allowJs": true,
     "strict": true,
     "noEmit": true,
@@ -28,7 +30,11 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "**/*.mts"
+    "**/*.mts",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "**/*.test.ts",
+    "**/*.test.tsx"
   ],
   "exclude": ["node_modules"]
 }
