@@ -1,10 +1,12 @@
 {
   "compilerOptions": {
     "incremental": true,
+    "composite": true,
     "target": "ES2023",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "baseUrl": "./",
+    "ignoreDeprecations": "6.0",
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "paths": {
