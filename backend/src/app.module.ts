@@ -28,6 +28,6 @@ import { isProduction } from './utils/check-env';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(MorganMiddleware).forRoutes('*');
+    consumer.apply(MorganMiddleware).exclude('api/docs', 'api/docs/(.*)').forRoutes('*');
   }
 }
