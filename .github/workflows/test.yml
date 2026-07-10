@@ -1,9 +1,8 @@
 name: Run Tests
-
 on: [push, pull_request]
 
 jobs:
-  backend:
+  root:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -11,36 +10,59 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24.15.0
+          cache: "npm"
+          cache-dependency-path: |
+            package-lock.json
+            backend/package-lock.json
+            frontend/package-lock.json
 
-      # Cache root node_modules
-      - uses: actions/cache@v4
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm ci --prefix backend
+          npm ci --prefix frontend
+
+      - name: Cache node_modules
+        uses: actions/cache/save@v4
         with:
-          path: node_modules
-          key: ${{ runner.os }}-root-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-root-
+          path: |
+            node_modules
+            backend/node_modules
+            frontend/node_modules
+          key: ${{ runner.os }}-node-modules-${{ github.sha }}
 
-      # Cache backend node_modules
-      - uses: actions/cache@v4
-        with:
-          path: backend/node_modules
-          key: ${{ runner.os }}-backend-${{ hashFiles('backend/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-backend-
-
-      - run: npm ci
-      - run: npm ci
+  backend:
+    needs: root
+    runs-on: ubuntu-latest
+    defaults:
+      run:
         working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.15.0
+
+      - uses: actions/cache/restore@v4
+        with:
+          path: |
+            node_modules
+            backend/node_modules
+            frontend/node_modules
+          key: ${{ runner.os }}-node-modules-${{ github.sha }}
+          fail-on-cache-miss: true
 
       - run: npm run db:generate
-        working-directory: backend
       - run: npm run lint
-        working-directory: backend
       - run: npm test
-        working-directory: backend
 
   frontend:
+    needs: root
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
     steps:
       - uses: actions/checkout@v4
 
@@ -48,27 +70,14 @@ jobs:
         with:
           node-version: 24.15.0
 
-      # Cache root node_modules
-      - uses: actions/cache@v4
+      - uses: actions/cache/restore@v4
         with:
-          path: node_modules
-          key: ${{ runner.os }}-root-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-root-
-
-      # Cache frontend node_modules
-      - uses: actions/cache@v4
-        with:
-          path: frontend/node_modules
-          key: ${{ runner.os }}-frontend-${{ hashFiles('frontend/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-frontend-
-
-      - run: npm ci
-      - run: npm ci
-        working-directory: frontend
+          path: |
+            node_modules
+            backend/node_modules
+            frontend/node_modules
+          key: ${{ runner.os }}-node-modules-${{ github.sha }}
+          fail-on-cache-miss: true
 
       - run: npm run lint
-        working-directory: frontend
       - run: npm test
-        working-directory: frontend
