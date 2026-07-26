@@ -20,9 +20,7 @@ A production-ready full-stack monorepo with **NestJS 11** (backend) and **Next.j
 ## Quick Start
 
 ```bash
-npm install                          # install root deps
-npm --prefix app/backend install     # install backend deps
-npm --prefix app/frontend install    # install frontend deps
+npm install                          # install all the deps
 docker compose up -d                 # start Postgres & Redis
 npm --prefix app/backend run db:migrate-dev  # run Prisma migrations
 npm run dev                          # starts both backend & frontend

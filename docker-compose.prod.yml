@@ -29,7 +29,8 @@ services:
 
   backend:
     build:
-      context: ./app/backend
+      context: .
+      dockerfile: ./app/backend/Dockerfile
       target: prod
     container_name: Backend_prod
     restart: unless-stopped
@@ -54,7 +55,8 @@ services:
 
   frontend:
     build:
-      context: ./app/frontend
+      context: .
+      dockerfile: ./app/frontend/Dockerfile
       target: prod
     container_name: Frontend_prod
     restart: unless-stopped
