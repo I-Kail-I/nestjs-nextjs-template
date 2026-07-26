@@ -59,7 +59,7 @@ export default antfu(
   },
   // ===== BACKEND-SPECIFIC RULES =====
   {
-    files: ['backend/**/*.ts'],
+    files: ['app/backend/**/*.ts'],
     rules: {
       // Backend uses type imports differently
       'ts/consistent-type-imports': 'off',
@@ -77,7 +77,7 @@ export default antfu(
   },
   // ===== FRONTEND-SPECIFIC RULES =====
   {
-    files: ['frontend/**/*.ts', 'frontend/**/*.tsx'],
+    files: ['app/frontend/**/*.ts', 'app/frontend/**/*.tsx'],
     rules: {
       // Next.js specific
       '@next/next/no-img-element': 'off',

@@ -1,13 +1,14 @@
-import type { User } from '@/generated/prisma/client';
 import {
   ConflictException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { PrismaService } from '@/common/prisma/prisma.service';
+import { User } from '@/generated/prisma/client';
 import { comparePassword, hashPassword } from '@/lib/bcrypt';
-import { PrismaService } from '../common/prisma/prisma.service';
 import { CreateAuthDto, LoginDto } from './dto/create-auth.dto';
+import { AuthResponseDto } from './dto/response-auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -25,7 +26,7 @@ export class AuthService {
     return user;
   }
 
-  async register(createAuthDto: CreateAuthDto): Promise<Omit<User, 'password'>> {
+  async register(createAuthDto: CreateAuthDto): Promise<AuthResponseDto> {
     const hashedPassword = await hashPassword(createAuthDto.password);
 
     const checkEmail = await this.prisma.user.findUnique({
@@ -44,7 +45,7 @@ export class AuthService {
     return user;
   }
 
-  async login(loginDto: LoginDto): Promise<Omit<User, 'password'>> {
+  async login(loginDto: LoginDto): Promise<AuthResponseDto> {
     const user = await this.findOne(loginDto.email);
 
     const checkPassword = await comparePassword(loginDto.password, user.password);
@@ -58,7 +59,7 @@ export class AuthService {
     return result;
   }
 
-  async remove(email: string): Promise<User> {
+  async remove(email: string): Promise<AuthResponseDto> {
     await this.findOne(email);
 
     return this.prisma.user.delete({ where: { email } });
