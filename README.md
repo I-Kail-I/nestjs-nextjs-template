@@ -7,8 +7,8 @@ A production-ready full-stack starter with **NestJS** (backend) and **Next.js**
 
 ```bash
 npm install             # install root deps
-npm --prefix backend install    # install backend deps
-npm --prefix frontend install   # install frontend deps
+npm --prefix app/backend install    # install backend deps
+npm --prefix app/frontend install   # install frontend deps
 npm run dev             # starts both backend & frontend
 ```
 
@@ -21,38 +21,39 @@ npm run dev             # starts both backend & frontend
 
 ```bash
 docker compose up -d                     # start Postgres & Redis
-npm --prefix backend run prisma:migrate  # run migrations
+npm --prefix app/backend run prisma:migrate  # run migrations
 npm run dev                              # start dev servers
 ```
 
 ## Structure
 
 ```
-├── backend/                    # NestJS 11 API
-│   ├── prisma/
-│   │   └── schema.prisma       # Prisma schema
-│   │   └── migrations          # Prisma migrations
-│   └── src/
-│       ├── main.ts             # App bootstrap
-│       ├── app.module.ts       # Root module
-│       ├── auth/               # Auth module (register/login)
-│       │   ├── auth.controller.ts
-│       │   ├── auth.service.ts
-│       │   ├── auth.module.ts
-│       │   └── dto/            # Validation DTOs
-│       ├── common/             # Shared modules (prisma, etc.)
-│       │   └── prisma/         # Prisma client service
-│       ├── lib/                # Utility functions (bcrypt, etc.)
-│       ├── utils/              # General helpers
-│       └── generated/prisma/   # Auto-generated (gitignored)
-├── frontend/                   # Next.js 16 app
-│   └── src/
-│       ├── app/
-│       │   ├── layout.tsx      # Root layout
-│       │   ├── page.tsx        # Home page
-│       │   └── example/        # Example feature
-│       ├── components/ui/      # shadcn-styled primitives
-│       └── lib/                # Shared utils (Axios, cn)
+├── app/
+│   ├── backend/                # NestJS 11 API
+│   │   ├── prisma/
+│   │   │   └── schema.prisma       # Prisma schema
+│   │   │   └── migrations          # Prisma migrations
+│   │   └── src/
+│   │       ├── main.ts             # App bootstrap
+│   │       ├── app.module.ts       # Root module
+│   │       ├── auth/               # Auth module (register/login)
+│   │       │   ├── auth.controller.ts
+│   │       │   ├── auth.service.ts
+│   │       │   ├── auth.module.ts
+│   │       │   └── dto/            # Validation DTOs
+│   │       ├── common/             # Shared modules (prisma, etc.)
+│   │       │   └── prisma/         # Prisma client service
+│   │       ├── lib/                # Utility functions (bcrypt, etc.)
+│   │       ├── utils/              # General helpers
+│   │       └── generated/prisma/   # Auto-generated (gitignored)
+│   └── frontend/               # Next.js 16 app
+│       └── src/
+│           ├── app/
+│           │   ├── layout.tsx      # Root layout
+│           │   ├── page.tsx        # Home page
+│           │   └── example/        # Example feature
+│           ├── components/ui/      # shadcn-styled primitives
+│           └── lib/                # Shared utils (Axios, cn)
 ├── docker-compose.yml          # Dev services (Postgres, Redis)
 ├── docker-compose.prod.yml     # Production deploy
 └── .github/workflows/test.yml  # CI pipeline
@@ -62,7 +63,7 @@ npm run dev                              # start dev servers
 
 ### Frontend — feature-first pattern
 
-Each feature in `frontend/src/app/` follows a consistent pattern:
+Each feature in `app/frontend/src/app/` follows a consistent pattern:
 
 ```
 example/

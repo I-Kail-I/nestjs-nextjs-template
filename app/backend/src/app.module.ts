@@ -4,8 +4,8 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { LoggerModule } from 'nestjs-pino';
 import { MorganMiddleware } from './common/middleware/morgan.middleware';
 import { PrismaModule } from './common/prisma/prisma.module';
-import { AuthModule } from './module/auth/auth.module';
-import { HealthController } from './module/health/health.controller';
+import { AuthModule } from './modules/auth/auth.module';
+import { HealthController } from './modules/health/health.controller';
 import { isProduction } from './utils/check-env';
 
 @Module({

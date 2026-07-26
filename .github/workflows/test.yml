@@ -13,22 +13,22 @@ jobs:
           cache: "npm"
           cache-dependency-path: |
             package-lock.json
-            backend/package-lock.json
-            frontend/package-lock.json
+            app/backend/package-lock.json
+            app/frontend/package-lock.json
 
       - name: Install dependencies
         run: |
           npm ci
-          npm ci --prefix backend
-          npm ci --prefix frontend
+          npm ci --prefix app/backend
+          npm ci --prefix app/frontend
 
       - name: Cache node_modules
         uses: actions/cache/save@v4
         with:
           path: |
             node_modules
-            backend/node_modules
-            frontend/node_modules
+            app/backend/node_modules
+            app/frontend/node_modules
           key: ${{ runner.os }}-node-modules-${{ github.sha }}
 
   backend:
@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: backend
+        working-directory: app/backend
     steps:
       - uses: actions/checkout@v4
 
@@ -48,8 +48,8 @@ jobs:
         with:
           path: |
             node_modules
-            backend/node_modules
-            frontend/node_modules
+            app/backend/node_modules
+            app/frontend/node_modules
           key: ${{ runner.os }}-node-modules-${{ github.sha }}
           fail-on-cache-miss: true
 
@@ -62,7 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: frontend
+        working-directory: app/frontend
     steps:
       - uses: actions/checkout@v4
 
@@ -74,8 +74,8 @@ jobs:
         with:
           path: |
             node_modules
-            backend/node_modules
-            frontend/node_modules
+            app/backend/node_modules
+            app/frontend/node_modules
           key: ${{ runner.os }}-node-modules-${{ github.sha }}
           fail-on-cache-miss: true
 
