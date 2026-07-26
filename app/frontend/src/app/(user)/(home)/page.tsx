@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { UserContainer } from './_components/user-container';
-import { useUser } from './hooks/hooks.client';
+import { useUser } from './_hooks/hooks.client';
 
 export default function UserPage() {
   const { data: user, isLoading, isError } = useUser();
