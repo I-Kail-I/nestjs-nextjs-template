@@ -1,8 +1,8 @@
 import { ConflictException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { PrismaService } from '@/common/prisma/prisma.service';
 import { Role } from '@/generated/prisma/enums';
 import { comparePassword, hashPassword } from '@/lib/bcrypt';
-import { PrismaService } from '../common/prisma/prisma.service';
 import { AuthService } from './auth.service';
 
 jest.mock('@/common/prisma/prisma.service', () => ({
