@@ -1,10 +1,11 @@
+import type { ZodIssue } from 'zod';
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { PinoLogger } from 'nestjs-pino';
 import { isProduction } from '@/utils/check-env';
 
 interface ExceptionResponse {
-  message: string | string[];
+  message: string | ZodIssue[];
   error?: string;
   statusCode?: number;
 }
@@ -34,11 +35,21 @@ export class AllExceptionsFilter implements ExceptionFilter {
         const respMessage = exceptionResponse.message;
 
         if (Array.isArray(respMessage)) {
-          for (const msg of respMessage) {
-            errors.push({
-              field: msg.split(' ')[0],
-              message: msg,
-            });
+          const first = respMessage[0];
+          if (typeof first === 'object' && first !== null && 'path' in first && 'code' in first) {
+            for (const issue of respMessage) {
+              errors.push({
+                field: issue.path.join('.'),
+                message: issue.message,
+              });
+            }
+          } else if (Array.isArray(respMessage)) {
+            for (const msg of respMessage as string[]) {
+              errors.push({
+                field: String(msg).split(' ')[0],
+                message: String(msg),
+              });
+            }
           }
           message = 'Validation failed';
         } else if (typeof respMessage === 'string') {

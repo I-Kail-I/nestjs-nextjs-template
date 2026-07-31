@@ -1,12 +1,12 @@
-import type { UserDto } from '../user.dto';
+import type { AuthResponse } from '@template/schema';
 import { axiosInstance } from '@/lib/axios';
-import { UserSchema } from '../user.dto';
+import { AuthResponseSchema } from '@template/schema';
 
-export async function fetchUser(): Promise<UserDto> {
+export async function fetchUser(): Promise<AuthResponse> {
   try {
     const response = await axiosInstance.get('/user');
 
-    const validatedUser = UserSchema.parse(response.data);
+    const validatedUser = AuthResponseSchema.parse(response.data);
 
     return validatedUser;
   } catch (error: unknown) {

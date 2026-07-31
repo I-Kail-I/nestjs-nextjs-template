@@ -20,6 +20,7 @@ import { isProduction } from './utils/check-env';
 
     // Structured logging (Pino + Morgan)
     LoggerModule.forRoot({
+      forRoutes: ['{*path}'],
       pinoHttp: {
         transport: isProduction
           ? undefined
@@ -49,9 +50,6 @@ import { isProduction } from './utils/check-env';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(MorganMiddleware)
-      .exclude('api/docs', 'api/docs/(.*)') // Skip Swagger routes
-      .forRoutes('*');
+    consumer.apply(MorganMiddleware).exclude('docs', 'docs/{*path}').forRoutes('{*path}');
   }
 }

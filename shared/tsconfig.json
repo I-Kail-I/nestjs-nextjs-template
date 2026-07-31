@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "target": "ES2023",
+    "rootDir": ".",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "allowImportingTsExtensions": true,
+    "strict": true,
+    "declaration": true,
+    "outDir": "./dist",
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*"]
+}

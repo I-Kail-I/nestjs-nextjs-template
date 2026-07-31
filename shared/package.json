@@ -1,4 +1,16 @@
 {
-  "name": "shared",
-  "version": "1.0.0"
+  "name": "@template/schema",
+  "type": "module",
+  "version": "0.0.1",
+  "private": true,
+  "exports": {
+    ".": "./src/schema/index.ts",
+    "./helper/*": "./src/helper/*.ts",
+    "./*": "./src/schema/*"
+  },
+  "main": "src/schema/index.ts",
+  "types": "src/schema/index.ts",
+  "dependencies": {
+    "zod": "^4.4.3"
+  }
 }

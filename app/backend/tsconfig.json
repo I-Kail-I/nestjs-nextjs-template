@@ -10,10 +10,7 @@
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "paths": {
-      "@/*": ["./src/*"],
-      "@/modules/*": ["src/modules/*"],
-      "@/utils/*": ["src/utils/*"],
-      "@/common/*": ["src/common/*"]
+      "@/*": ["./src/*"]
     },
     "resolvePackageJsonExports": true,
     "types": ["jest", "node"],
@@ -32,6 +29,7 @@
     "skipLibCheck": true,
     "ignoreDeprecations": "6.0"
   },
+  "references": [{ "path": "../../shared" }],
   "include": ["src/**/*", "test/**/*"],
   "exclude": ["node_modules", "dist"]
 }

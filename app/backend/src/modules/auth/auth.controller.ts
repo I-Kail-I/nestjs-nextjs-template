@@ -1,8 +1,9 @@
 import { Body, Controller, Delete, Param, Post } from '@nestjs/common';
 import { ApiOkResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { CreateAuthDto, LoginDto } from './dto/create-auth.dto';
-import { AuthResponseDto } from './dto/response-auth.dto';
+import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto';
+import { AuthResponseDto } from './dto/response.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -10,8 +11,8 @@ export class AuthController {
 
   @ApiOkResponse({ type: AuthResponseDto })
   @Post('register/email-password')
-  async register(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.register(createAuthDto);
+  async register(@Body() registerDto: RegisterDto) {
+    return this.authService.register(registerDto);
   }
 
   @ApiOkResponse({ type: AuthResponseDto })

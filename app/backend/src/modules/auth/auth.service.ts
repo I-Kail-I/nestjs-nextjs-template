@@ -1,3 +1,4 @@
+import type { AuthResponse, Login, Register, User } from '@template/schema';
 import {
   ConflictException,
   Injectable,
@@ -5,10 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from '@/common/prisma/prisma.service';
-import { User } from '@/generated/prisma/client';
 import { comparePassword, hashPassword } from '@/lib/bcrypt';
-import { CreateAuthDto, LoginDto } from './dto/create-auth.dto';
-import { AuthResponseDto } from './dto/response-auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -26,11 +24,11 @@ export class AuthService {
     return user;
   }
 
-  async register(createAuthDto: CreateAuthDto): Promise<AuthResponseDto> {
-    const hashedPassword = await hashPassword(createAuthDto.password);
+  async register(data: Register): Promise<AuthResponse> {
+    const hashedPassword = await hashPassword(data.password);
 
     const checkEmail = await this.prisma.user.findUnique({
-      where: { email: createAuthDto.email },
+      where: { email: data.email },
     });
 
     if (checkEmail) {
@@ -38,17 +36,17 @@ export class AuthService {
     }
 
     const user = await this.prisma.user.create({
-      data: { ...createAuthDto, password: hashedPassword },
+      data: { ...data, password: hashedPassword },
       omit: { password: true },
     });
 
     return user;
   }
 
-  async login(loginDto: LoginDto): Promise<AuthResponseDto> {
-    const user = await this.findOne(loginDto.email);
+  async login(data: Login): Promise<AuthResponse> {
+    const user = await this.findOne(data.email);
 
-    const checkPassword = await comparePassword(loginDto.password, user.password);
+    const checkPassword = await comparePassword(data.password, user.password);
 
     if (!checkPassword) {
       throw new UnauthorizedException('Password is incorrect');
@@ -59,7 +57,7 @@ export class AuthService {
     return result;
   }
 
-  async remove(email: string): Promise<AuthResponseDto> {
+  async remove(email: string): Promise<AuthResponse> {
     await this.findOne(email);
 
     return this.prisma.user.delete({ where: { email } });

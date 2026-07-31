@@ -1,5 +1,5 @@
 {
-  "references": [{ "path": "./app/frontend" }, { "path": "./app/backend" }],
+  "references": [{ "path": "./app/frontend" }, { "path": "./app/backend" }, { "path": "./shared/schema" }],
   "files": [],
   "include": ["app/frontend/**/*.ts", "app/frontend/**/*.tsx", "app/frontend/**/*.mts", "app/backend/**/*.ts"],
   "exclude": ["node_modules", "dist", ".next"]

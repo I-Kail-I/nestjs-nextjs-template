@@ -1,6 +1,6 @@
 /* eslint-disable perfectionist/sort-imports */
 import 'dotenv/config';
-import { ValidationPipe } from '@nestjs/common';
+import { ZodValidationPipe } from 'nestjs-zod';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
@@ -18,13 +18,7 @@ async function bootstrap() {
 
   app.useLogger(app.get(Logger));
 
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-    }),
-  );
+  app.useGlobalPipes(new ZodValidationPipe());
 
   app.enableCors({
     origin: process.env.NODE_ENV === 'production' ? process.env.FRONTEND_URL : '*',

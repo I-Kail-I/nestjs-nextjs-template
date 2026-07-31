@@ -31,10 +31,11 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react-refresh": "^0.5.3",
     "prettier": "^3.9.4",
-    "prettier-plugin-tailwindcss": "^0.8.0"
+    "prettier-plugin-tailwindcss": "^0.8.0",
+    "typescript": "^6.0.3"
   },
   "workspaces": [
     "./app/*",
-    "./shared"
+    "./shared/*"
   ]
 }
