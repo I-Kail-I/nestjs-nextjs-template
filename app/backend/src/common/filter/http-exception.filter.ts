@@ -1,11 +1,10 @@
-import type { ZodIssue } from 'zod';
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { PinoLogger } from 'nestjs-pino';
 import { isProduction } from '@/utils/check-env';
 
 interface ExceptionResponse {
-  message: string | ZodIssue[];
+  message: string | string[];
   error?: string;
   statusCode?: number;
 }
