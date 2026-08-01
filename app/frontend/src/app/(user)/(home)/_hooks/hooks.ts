@@ -1,6 +1,6 @@
 import type { AuthResponse } from '@template/schema';
-import { axiosInstance } from '@/lib/axios';
 import { AuthResponseSchema } from '@template/schema';
+import { axiosInstance } from '@/lib/axios';
 
 export async function fetchUser(): Promise<AuthResponse> {
   try {
