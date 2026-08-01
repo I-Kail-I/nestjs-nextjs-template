@@ -1,10 +1,11 @@
+import type { ZodIssue } from 'zod';
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { PinoLogger } from 'nestjs-pino';
 import { isProduction } from '@/utils/check-env';
 
 interface ExceptionResponse {
-  message: string | string[];
+  message: string | ZodIssue[];
   error?: string;
   statusCode?: number;
 }
@@ -43,7 +44,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
               });
             }
           } else if (Array.isArray(respMessage)) {
-            for (const msg of respMessage as string[]) {
+            for (const msg of respMessage as unknown as string[]) {
               errors.push({
                 field: String(msg).split(' ')[0],
                 message: String(msg),
