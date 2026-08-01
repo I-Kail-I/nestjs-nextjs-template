@@ -74,21 +74,27 @@
       "json",
       "ts"
     ],
-    "rootDir": "src",
-    "testRegex": ".*\\.spec\\.ts$",
+    "rootDir": "../..",
+    "testRegex": "app/backend/src/.*\\.spec\\.ts$",
     "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
+      "^.+\\.(t|j)s$": [
+        "ts-jest",
+        {
+          "tsconfig": "<rootDir>/app/backend/tsconfig.spec.json"
+        }
+      ]
     },
-    "collectCoverageFrom": [
-      "**/*.(t|j)s"
+    "transformIgnorePatterns": [
+      "/node_modules/(?!@template/)"
     ],
-    "coverageDirectory": "../coverage",
+    "collectCoverageFrom": [
+      "app/backend/src/**/*.(t|j)s"
+    ],
+    "coverageDirectory": "app/backend/coverage",
     "testEnvironment": "node",
     "moduleNameMapper": {
-      "^`@template/schema/helper/`(.*)$": "<rootDir>/../../../shared/src/helper/$1",
-      "^`@template/schema/`(.*)$": "<rootDir>/../../../shared/src/schema/$1",
-      "^`@template/schema`$": "<rootDir>/../../../shared/src/schema/index.ts",
-      "^@/(.*)$": "<rootDir>/$1"
+      "^@template/schema$": "<rootDir>/shared/src/schema/index.ts",
+      "^@/(.*)$": "<rootDir>/app/backend/src/$1"
     }
   }
 }
