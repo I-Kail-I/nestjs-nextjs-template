@@ -11,6 +11,6 @@ export const RegisterSchema = z.object({
       message: 'Password must contain at least one special character',
     })
     .regex(/[A-Z]/, { message: 'Must contain at least an uppercase character' }),
-});
+}).strict();
 
 export type Register = z.infer<typeof RegisterSchema>;
