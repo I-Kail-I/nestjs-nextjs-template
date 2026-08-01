@@ -85,9 +85,9 @@
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
     "moduleNameMapper": {
-      "^`@template/schema/helper/`(.*)$": "<rootDir>/../../../shared/src/helper/$1",  
-      "^`@template/schema/`(.*)$": "<rootDir>/../../../shared/src/schema/$1",  
-      "^`@template/schema`$": "<rootDir>/../../../shared/src/schema/index.ts",  
+      "^`@template/schema/helper/`(.*)$": "<rootDir>/../../../shared/src/helper/$1",
+      "^`@template/schema/`(.*)$": "<rootDir>/../../../shared/src/schema/$1",
+      "^`@template/schema`$": "<rootDir>/../../../shared/src/schema/index.ts",
       "^@/(.*)$": "<rootDir>/$1"
     }
   }
