@@ -8,19 +8,16 @@ FROM base AS builder
 
 # Copy manifest files first for cache optimization
 COPY package.json package-lock.json ./
-COPY shared/package.json ./shared/
 COPY app/frontend/package.json ./app/frontend/
 
 # Install ALL dependencies
 RUN npm ci
 
 # Copy source code
-COPY shared ./shared
 COPY app/frontend ./app/frontend
 
 # Build Next.js app (creates .next/standalone)
 RUN npm run build --workspace=frontend
-
 
 # ===== PRODUCTION STAGE =====
 FROM base AS prod
