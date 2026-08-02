@@ -10,5 +10,5 @@ export default function UserPage() {
   if (isLoading) return <div>Loading user profile...</div>;
   if (isError || !user) return <div>Error loading user data.</div>;
 
-  return <UserContainer userName={user.name} />;
+  return <UserContainer userName={`${user.first_name} ${user.last_name}`} />;
 }

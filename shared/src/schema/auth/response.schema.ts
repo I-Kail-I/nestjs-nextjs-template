@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { UserSchema } from './user.schema.ts';
+import { UserSchema } from './user.schema';
 
 export const AuthResponseSchema = UserSchema.omit({ password: true });
 

@@ -74,27 +74,19 @@
       "json",
       "ts"
     ],
-    "rootDir": "../..",
-    "testRegex": "app/backend/src/.*\\.spec\\.ts$",
+    "rootDir": "src",
+    "testRegex": ".*\\.spec\\.ts$",
     "transform": {
-      "^.+\\.(t|j)s$": [
-        "ts-jest",
-        {
-          "tsconfig": "<rootDir>/app/backend/tsconfig.spec.json"
-        }
-      ]
+      "^.+\\.(t|j)s$": "ts-jest"
     },
-    "transformIgnorePatterns": [
-      "/node_modules/(?!@template/)"
-    ],
     "collectCoverageFrom": [
-      "app/backend/src/**/*.(t|j)s"
+      "**/*.(t|j)s"
     ],
     "coverageDirectory": "app/backend/coverage",
     "testEnvironment": "node",
     "moduleNameMapper": {
-      "^@template/schema$": "<rootDir>/shared/src/schema/index.ts",
-      "^@/(.*)$": "<rootDir>/app/backend/src/$1"
+      "^@template/schema$": "<rootDir>/../../../shared/src/schema/index.ts",
+      "^@/(.*)$": "<rootDir>/$1"
     }
   }
 }

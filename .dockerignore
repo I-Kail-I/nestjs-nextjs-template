@@ -28,8 +28,8 @@ out
 # ------------------------
 # Generated Code & Data
 # ------------------------
-/src/generated/
-generated/prisma
+**/generated/
+**/generated/prisma
 uploads
 .temp
 .tmp
@@ -86,3 +86,9 @@ next-env.d.ts
 *.launch
 .settings
 *.sublime-workspace
+
+# ------------------------
+# Testing file
+# ------------------------
+**/*.spec.ts
+**/*.spec.tsx

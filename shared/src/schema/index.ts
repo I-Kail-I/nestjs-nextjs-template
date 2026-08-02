@@ -1,2 +1,2 @@
 // AUTH TYPES & SCHEMA
-export * from './auth/index.ts';
+export * from './auth/index';
