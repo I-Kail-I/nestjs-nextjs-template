@@ -5,3 +5,7 @@ dist
 
 .env*
 !.env.example
+
+.opencode/**/*
+!.opencode/skills/
+!.opencode/skills/**
