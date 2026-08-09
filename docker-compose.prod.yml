@@ -16,8 +16,6 @@ services:
         max-file: "3"
     environment:
       - DOMAIN=${DOMAIN}
-      - BACKEND_PORT=${BACKEND_PORT}
-      - FRONTEND_PORT=${FRONTEND_PORT}
     volumes:
       - caddy_data:/data
       - caddy_config:/config
@@ -39,15 +37,16 @@ services:
       options:
         max-size: 10m
         max-file: "3"
-    environment:
-      - PORT=${BACKEND_PORT}
-      - DATABASE_URL=${DATABASE_URL}
-      - JWT_SECRET=${JWT_SECRET}
-      - NODE_ENV=${NODE_ENV}
-      - FRONTEND_URL=${FRONTEND_URL}
-      - REDIS_URL=${REDIS_URL}
+    env_file:
+      - ./app/backend/.env
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:' + process.env.PORT + '/api/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://localhost:' + process.env.PORT + '/api/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))",
+        ]
       interval: 30s
       timeout: 3s
       retries: 3
@@ -67,12 +66,70 @@ services:
       options:
         max-size: 10m
         max-file: "3"
+    env_file:
+      - ./app/frontend/.env
+
+  # =======================================================================
+  # SOME NOTES ABOUT THE DATABASE AND CACHE SERVICES
+
+  # config for database and cache if you want to use them in production,
+  #   otherwise you can remove these services and their volumes and the envionment variables from the .env file
+
+  # I reccomend you to actually remove them, and manage the database and cache outside of docker, for example using a managed service like AWS RDS or AWS ElastiCache, or using a separate server for them.
+  #   so you can remove the following lines if you don't want to use them, and also remove the corresponding environment variables from the .env file if you did followed the recommendation to remove them.
+
+  # But if you did want to use them, just make sure to change the passwords and usernames in the .env file, and also change the database name if you want to use a different one.
+  #   and then in the backend service dont forgot to put depend_on for the database and cache services to make sure they are started before the backend service
+  # =======================================================================
+
+  database:
+    image: postgres:17-alpine@sha256:dc17045ccfd343b49600570ea734b9c4991cf1c3f3302e67df51e3b402dd55c4
+    container_name: Database_prod
+    restart: unless-stopped
     environment:
-      - API_URL=${API_URL}
-      - NEXT_PUBLIC_API_PREFIX=${NEXT_PUBLIC_API_PREFIX}
-      - PORT=${FRONTEND_PORT}
-      - NODE_ENV=${NODE_ENV}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_NAME}"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+
+  cache:
+    image: redis:8.8.1@sha256:3eafabb4c93fcb8b36b666e07a43f096cb157bc6b07dce4b2492b895c63cf37f
+    container_name: Cache_prod
+    restart: unless-stopped
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    command: redis-server --requirepass ${REDIS_PASSWORD:-production_redis_password}
+    volumes:
+      - redis_data_prod:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-production_redis_password}", "ping"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    depends_on:
+      database:
+        condition: service_healthy
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
 
 volumes:
   caddy_data:
   caddy_config:
+  postgres_data_prod:
+  redis_data_prod:
