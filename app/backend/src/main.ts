@@ -2,11 +2,11 @@
 import 'dotenv/config';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { AppModule } from '@/app.module';
 import { Logger } from 'nestjs-pino';
 import cookieParser from 'cookie-parser';
+import { PrismaClientExceptionFilter } from '@/common/filter/prisma-client-exception.filter';
 import { isDevelopment } from './utils/check-env';
 
 async function bootstrap() {
@@ -18,6 +18,10 @@ async function bootstrap() {
 
   app.useLogger(app.get(Logger));
 
+  // Global filters
+  app.useGlobalFilters(new PrismaClientExceptionFilter());
+
+  // Global pipes
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -26,18 +30,35 @@ async function bootstrap() {
     }),
   );
 
-  app.enableCors({
-    origin: process.env.NODE_ENV === 'production' ? process.env.FRONTEND_URL : '*',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: 'Content-Type, Accept, Authorization',
-    credentials: true,
-  });
+  /**
+   * ! SOME NOTE FOR THIS!
+   * So I create this CORS incase you want to seperate
+   * your backend and frontend as seprate domain
+   * but by default I use the proxy in the nextjs and for prod
+   * I use Caddy, so technically you dont need this. And if you
+   * want to use this, you can uncomment this, or delete it if
+   * you dont want to use it.
+   */
 
+  // app.enableCors({
+  //   origin: process.env.NODE_ENV === 'production' ? process.env.FRONTEND_URL : '*',
+  //   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  //   allowedHeaders: 'Content-Type, Accept, Authorization',
+  //   credentials: true,
+  // });
+
+  // The backend will start as "/api" at the url
+  // So if you want to access the backend, you need to use "/api" as prefix
   app.setGlobalPrefix('api');
+
+  // Middlewares
   app.use(helmet());
   app.use(cookieParser());
 
+  // This is for the swagger docs, it by default is only available in development
   if (isDevelopment) {
+    const { DocumentBuilder, SwaggerModule } = await import('@nestjs/swagger');
+
     const config = new DocumentBuilder()
       .setTitle('My API')
       .setDescription('API description')
