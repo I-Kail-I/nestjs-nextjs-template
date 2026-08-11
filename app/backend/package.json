@@ -55,7 +55,6 @@
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.0.0",
     "@types/pg": "^8.20.0",
-    "@types/react-helmet": "^6.1.11",
     "@types/supertest": "^7.0.0",
     "globals": "^17.0.0",
     "jest": "^30.0.0",
