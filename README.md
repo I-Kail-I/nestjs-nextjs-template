@@ -1,16 +1,17 @@
 # Full-Stack Monorepo Template
 
-A production-ready full-stack monorepo with **NestJS 11** (backend) and **Next.js 16** (frontend), containerized with Docker.
+A production-ready full-stack monorepo with **NestJS 11** (backend) and
+**Next.js 16** (frontend), containerized with Docker.
 
 ## Stack
 
-| Layer    | Tech                                                                       |
-| -------- | -------------------------------------------------------------------------- |
+| Layer    | Tech                                                                                            |
+| -------- | ----------------------------------------------------------------------------------------------- |
 | Backend  | NestJS 11, TypeScript, Prisma 7 + PostgreSQL, SWC, Passport (cookie sessions), bcryptjs, Helmet |
-| Frontend | Next.js 16, React 19, Tailwind v4, shadcn/ui (base-vega), Base UI         |
-| Data     | TanStack React Query, Zustand, Zod v4, Axios                              |
-| Logging  | Pino (nestjs-pino), Morgan HTTP middleware                                 |
-| Infra    | Docker, Docker Compose, Caddy reverse proxy, GitHub Actions               |
+| Frontend | Next.js 16, React 19, Tailwind v4, shadcn/ui (base-vega), Base UI                               |
+| Data     | TanStack React Query, Zustand, Zod v4, Axios                                                    |
+| Logging  | Pino (nestjs-pino), Morgan HTTP middleware                                                      |
+| Infra    | Docker, Docker Compose, Caddy reverse proxy, GitHub Actions                                     |
 
 ## Prerequisites
 
@@ -74,7 +75,7 @@ npm run dev                          # starts both backend & frontend
     │   │   └── auth.e2e-spec.ts      # Auth E2E tests (register, login, session, delete-account)
     │   │
     │   └── src/
-    │       ├── main.ts                # App bootstrap: ValidationPipe, Helmet, cookie-parser, Prisma exception filter, Swagger (dev), global prefix 'api'
+    │       ├── main.ts                # App bootstrap: ValidationPipe, Helmet, cookie-parser, global filters, Swagger (dev), global prefix 'api'
     │       ├── app.module.ts          # Root module: ThrottlerModule (rate limiting), LoggerModule (Pino), MorganMiddleware, PrismaModule, AuthModule, HealthController
     │       │
     │       ├── common/
@@ -88,6 +89,9 @@ npm run dev                          # starts both backend & frontend
     │       │   ├── filter/
     │       │   │   ├── http-exception.filter.ts  # AllExceptionsFilter (env-aware stack traces, structured errors)
     │       │   │   └── prisma-client-exception.filter.ts # Maps Prisma errors (e.g. P2002 → 409 Conflict)
+    │       │   ├── redis/
+    │       │   │   ├── redis.module.ts            # @Global module, exports RedisService
+    │       │   │   └── redis.service.ts           # ioredis client, lazyConnect + retry strategy (boots without Redis)
     │       │   └── middleware/
     │       │       └── morgan.middleware.ts      # Morgan HTTP logger piped to Pino, excludes Swagger routes
     │       │
@@ -197,10 +201,12 @@ Each route group in `app/frontend/src/app/` follows a consistent pattern:
 
 Pattern conventions:
 
-- `_components/` / `_hooks/` / `_sections/` — private folders (excluded from routing)
+- `_components/` / `_hooks/` / `_sections/` — private folders (excluded from
+  routing)
 - `user.dto.ts` — Zod schema + derived TypeScript type
 - `hooks.ts` — pure fetch function, HTTP call + Zod parse
-- `hooks.client.ts` — TanStack React Query wrapper, handles stale time and query keys
+- `hooks.client.ts` — TanStack React Query wrapper, handles stale time and query
+  keys
 
 ## NestJS Module Pattern (Backend)
 
@@ -225,14 +231,14 @@ auth/
 
 In development mode, Swagger UI is available at `/api/docs`. Endpoints:
 
-| Method | Endpoint                  | Description          |
-| ------ | ------------------------- | -------------------- |
-| GET    | `/api/health`             | Health check         |
-| POST   | `/api/auth/register/email-password` | Register user |
-| POST   | `/api/auth/login/email-password`    | Login (sets session cookie) |
-| POST   | `/api/auth/logout`        | Logout (revokes session) |
-| GET    | `/api/auth/me`            | Current user (session required) |
-| DELETE | `/api/auth/delete-account`| Delete current user (session required) |
+| Method | Endpoint                            | Description                            |
+| ------ | ----------------------------------- | -------------------------------------- |
+| GET    | `/api/health`                       | Health check                           |
+| POST   | `/api/auth/register/email-password` | Register user                          |
+| POST   | `/api/auth/login/email-password`    | Login (sets session cookie)            |
+| POST   | `/api/auth/logout`                  | Logout (revokes session)               |
+| GET    | `/api/auth/me`                      | Current user (session required)        |
+| DELETE | `/api/auth/delete-account`          | Delete current user (session required) |
 
 ## Environment Variables
 
@@ -272,9 +278,6 @@ DATABASE_URL=postgresql://username:password@localhost:5432/mydatabase
 # Cache
 REDIS_URL=redis://:my_secure_password@localhost:6379/0
 
-# Auth
-JWT_SECRET=your-secret-key-change-this
-
 # Frontend connection
 FRONTEND_URL=http://backend:3000
 ```
@@ -294,68 +297,70 @@ NEXT_PUBLIC_API_PREFIX=/api
 
 ### Global (root)
 
-| Command                   | Description                            |
-| ------------------------- | -------------------------------------- |
-| `npm run dev`             | Run backend + frontend concurrently    |
-| `npm run dev:backend`     | Backend only (port 8000)               |
-| `npm run dev:frontend`    | Frontend only (port 3000)              |
-| `npm run lint`            | ESLint (both projects)                 |
-| `npm run lint:fix`        | ESLint auto-fix                        |
-| `npm run lint:backend`    | ESLint (backend only)                  |
-| `npm run lint:frontend`   | ESLint (frontend only)                 |
-| `npm run test`            | Run all tests (backend → frontend)     |
-| `npm run test:backend`    | Backend unit tests                     |
-| `npm run test:frontend`   | Frontend unit tests                    |
-| `npm run format`          | Prettier (all files)                   |
-| `npm run format:check`    | Prettier check only                    |
-| `npm run format:backend`  | Prettier (backend only)                |
-| `npm run format:frontend` | Prettier (frontend only)               |
+| Command                   | Description                         |
+| ------------------------- | ----------------------------------- |
+| `npm run dev`             | Run backend + frontend concurrently |
+| `npm run dev:backend`     | Backend only (port 8000)            |
+| `npm run dev:frontend`    | Frontend only (port 3000)           |
+| `npm run lint`            | ESLint (both projects)              |
+| `npm run lint:fix`        | ESLint auto-fix                     |
+| `npm run lint:backend`    | ESLint (backend only)               |
+| `npm run lint:frontend`   | ESLint (frontend only)              |
+| `npm run test`            | Run all tests (backend → frontend)  |
+| `npm run test:backend`    | Backend unit tests                  |
+| `npm run test:frontend`   | Frontend unit tests                 |
+| `npm run format`          | Prettier (all files)                |
+| `npm run format:check`    | Prettier check only                 |
+| `npm run format:backend`  | Prettier (backend only)             |
+| `npm run format:frontend` | Prettier (frontend only)            |
 
 ### Docker
 
-| Command                        | Description                           |
-| ------------------------------ | ------------------------------------- |
-| `docker compose up -d`        | Start Postgres + Redis (dev)          |
-| `npm run build-prod`          | Build production Docker images        |
-| `npm run build:no-cache-prod` | Build from scratch (no layer cache)   |
+| Command                       | Description                                    |
+| ----------------------------- | ---------------------------------------------- |
+| `docker compose up -d`        | Start Postgres + Redis (dev)                   |
+| `npm run build-prod`          | Build production Docker images                 |
+| `npm run build:no-cache-prod` | Build from scratch (no layer cache)            |
 | `npm run docker:up-prod`      | Deploy full stack (Caddy + backend + frontend) |
-| `npm run docker:down`         | Stop production stack                 |
+| `npm run docker:down`         | Stop production stack                          |
 
 ### Backend (run from `app/backend`)
 
-| Command               | Description                      |
-| --------------------- | -------------------------------- |
-| `npm start`           | Start production server          |
-| `npm run start:dev`   | Watch mode (SWC)                 |
-| `npm run start:debug` | Debug mode                       |
-| `npm run build`       | Compile TypeScript               |
-| `npm run start:prod`  | Run compiled code                |
-| `npm test`            | Unit tests (Jest)                |
-| `npm run test:watch`  | Watch mode                       |
-| `npm run test:cov`    | With coverage                    |
-| `npm run test:e2e`    | E2E tests                        |
-| `npm run db:generate` | Generate Prisma client           |
-| `npm run db:migrate-dev` | Create a dev migration         |
-| `npm run db:migrate-prod`| Deploy prod migrations         |
-| `npm run db:studio`   | Open Prisma Studio               |
-| `npm run db:push`     | Push schema directly to DB       |
+| Command                   | Description                |
+| ------------------------- | -------------------------- |
+| `npm start`               | Start production server    |
+| `npm run start:dev`       | Watch mode (SWC)           |
+| `npm run start:debug`     | Debug mode                 |
+| `npm run build`           | Compile TypeScript         |
+| `npm run start:prod`      | Run compiled code          |
+| `npm test`                | Unit tests (Jest)          |
+| `npm run test:watch`      | Watch mode                 |
+| `npm run test:cov`        | With coverage              |
+| `npm run test:e2e`        | E2E tests                  |
+| `npm run db:generate`     | Generate Prisma client     |
+| `npm run db:migrate-dev`  | Create a dev migration     |
+| `npm run db:migrate-prod` | Deploy prod migrations     |
+| `npm run db:studio`       | Open Prisma Studio         |
+| `npm run db:push`         | Push schema directly to DB |
 
 ### Frontend (run from `app/frontend`)
 
-| Command              | Description                     |
-| -------------------- | ------------------------------- |
-| `npm run dev`        | Next.js dev server (Turbopack)  |
-| `npm run build`      | Production build                |
-| `npm start`          | Start production server         |
-| `npm test`           | Jest tests (jsdom)              |
-| `npm run test:watch` | Watch mode                      |
-| `npm run test:coverage` | With coverage                |
+| Command                 | Description                    |
+| ----------------------- | ------------------------------ |
+| `npm run dev`           | Next.js dev server (Turbopack) |
+| `npm run build`         | Production build               |
+| `npm start`             | Start production server        |
+| `npm test`              | Jest tests (jsdom)             |
+| `npm run test:watch`    | Watch mode                     |
+| `npm run test:coverage` | With coverage                  |
 
 ## CI/CD
 
-GitHub Actions (`.github/workflows/test.yml`) runs on every push and pull request with two parallel jobs:
+GitHub Actions (`.github/workflows/test.yml`) runs on every push and pull
+request with two parallel jobs:
 
-- **Backend** — installs dependencies (`npm ci` at the repo root), then runs `db:generate`, `lint`, and `test`
+- **Backend** — installs dependencies (`npm ci` at the repo root), then runs
+  `db:generate`, `lint`, and `test`
 - **Frontend** — installs dependencies (`npm ci`), then runs `lint` and `test`
 
 ## Prisma Schema
@@ -409,9 +414,11 @@ model Session {
 
 Key details:
 
-- Uses Prisma PostgreSQL adapter (`@prisma/adapter-pg`) with `pg` Pool for connection pooling
+- Uses Prisma PostgreSQL adapter (`@prisma/adapter-pg`) with `pg` Pool for
+  connection pooling
 - `User` and `Session` tables live under the `auth` schema (`@@schema("auth")`)
-- `Session` model backs cookie-based auth (opaque token, 7-day TTL, cascade delete on user removal)
+- `Session` model backs cookie-based auth (opaque token, 7-day TTL, cascade
+  delete on user removal)
 - Client output goes to `src/generated/prisma/` (gitignored, auto-generated)
 - Prisma config via `prisma.config.ts` (Prisma v7 config file format)
 
@@ -419,26 +426,95 @@ Key details:
 
 The production stack (`docker-compose.prod.yml`) includes five services:
 
-| Service  | Role                            | Ports         |
-| -------- | ------------------------------- | ------------- |
-| **Caddy**   | Reverse proxy + automatic HTTPS | 80, 443       |
-| **Backend** | NestJS API (compiled, no dev deps) | 8000 (internal) |
-| **Frontend**| Next.js (built .next, no dev deps) | 3000 (internal) |
-| **Database**| PostgreSQL 17                  | 5432 (internal) |
-| **Cache**   | Redis 8                        | 6379 (internal) |
+| Service      | Role                               | Ports           |
+| ------------ | ---------------------------------- | --------------- |
+| **Caddy**    | Reverse proxy + automatic HTTPS    | 80, 443         |
+| **Backend**  | NestJS API (compiled, no dev deps) | 8000 (internal) |
+| **Frontend** | Next.js (built .next, no dev deps) | 3000 (internal) |
+| **Database** | PostgreSQL 17                      | 5432 (internal) |
+| **Cache**    | Redis 8                            | 6379 (internal) |
 
-Caddy routes `/api/*` to the backend and everything else to the frontend. Each service runs with JSON file logging (10MB max, 3 files retained). The backend exposes a health check endpoint for container orchestration. The database and cache services are bundled for convenience — the compose file recommends managing them externally (e.g. AWS RDS / ElastiCache) in real production.
+Caddy routes `/api/*` to the backend and everything else to the frontend. Each
+service runs with JSON file logging (10MB max, 3 files retained). The backend
+exposes a health check endpoint for container orchestration. The database and
+cache services are bundled for convenience — the compose file recommends
+managing them externally (e.g. AWS RDS / ElastiCache) in real production.
+
+## Optional Configurations
+
+Several parts of the codebase ship with commented-out alternatives or optional
+behaviors. Each choice is documented inline in code; this section summarizes
+what you can toggle and how.
+
+### API hosting: reverse proxy vs. separate domains
+
+`app/backend/src/main.ts` contains a commented-out `app.enableCors(...)` block.
+
+- **Default (active):** reverse proxy — Next.js rewrites in production and Caddy
+  route `/api/*` to the backend on the same domain. No CORS needed.
+- **Alternative (commented):** host backend and frontend on separate domains.
+  Uncomment `app.enableCors()` and set `FRONTEND_URL` in the backend env. The
+  block also sets `origin` to `FRONTEND_URL` in production and `*` in
+  development.
+
+### Database & cache in production
+
+`docker-compose.prod.yml` bundles `database` (PostgreSQL) and `cache` (Redis)
+services with an inline note explaining the trade-off:
+
+- **Bundled (default):** DB and cache run as containers in the same stack.
+  Change passwords/usernames/DB name in the root `.env`.
+- **Recommended in note:** remove the `database`/`cache` services and their
+  volumes, and point `DATABASE_URL` / `REDIS_URL` at a managed service (AWS RDS,
+  ElastiCache) or a separate server.
+
+> **Note:** if you keep the bundled services, add `depends_on` to the `backend`
+> service (pointing at `database` and `cache`) so they start before the backend.
+> The inline comment mentions this, but the compose file does not currently
+> include it.
+
+### User banning via `is_active`
+
+`app/backend/prisma/schema.prisma` — `User.is_active` carries an inline note:
+
+- **Active (default):** `is_active` gates login, session validation, and account
+  deletion. Set it to `false` to block a user without deleting them.
+- **Alternative:** if you don't need soft-banning, delete the column and the
+  checks in `auth.service.ts` / `passport-session.strategy.ts`.
+
+### Prisma `public` schema
+
+`schema.prisma` datasource declares `schemas = ["public", "auth"]`, but every
+model and enum targets `auth` via `@@schema("auth")`:
+
+- **Default:** keep `public` if you plan to add models to the default schema.
+- **Alternative:** remove `"public"` from the datasource if all models stay in
+  `auth`.
+
+### Redis availability
+
+`app/backend/src/common/redis/redis.service.ts` uses `lazyConnect` with a
+background connection attempt:
+
+- **Redis up:** app connects and Redis is available for use.
+- **Redis down:** the app still boots and serves requests — connection is
+  retried with backoff, and failures only log a warning. No hard dependency.
 
 ## Tooling
 
 ### ESLint
 
-Single config (`eslint.config.mjs`) using `@antfu/eslint-config` with tier-specific overrides:
+Single config (`eslint.config.mjs`) using `@antfu/eslint-config` with
+tier-specific overrides:
 
-- **Global** — relaxed base rules, `ts/no-explicit-any: error`, `unused-imports/no-unused-vars: error`
-- **Backend** (`app/backend/**/*.ts`) — strict type safety: `no-unsafe-assignment`, `no-unsafe-call`, `strict-boolean-expressions`, etc.
-- **Frontend** (`app/frontend/**/*.{ts,tsx}`) — Next.js + React rules, looser type safety
-- **Tests** (`**/*.spec.ts`, `**/*.test.ts{x}`) — loosest type safety for mocks/assertions
+- **Global** — relaxed base rules, `ts/no-explicit-any: error`,
+  `unused-imports/no-unused-vars: error`
+- **Backend** (`app/backend/**/*.ts`) — strict type safety:
+  `no-unsafe-assignment`, `no-unsafe-call`, `strict-boolean-expressions`, etc.
+- **Frontend** (`app/frontend/**/*.{ts,tsx}`) — Next.js + React rules, looser
+  type safety
+- **Tests** (`**/*.spec.ts`, `**/*.test.ts{x}`) — loosest type safety for
+  mocks/assertions
 
 ### Prettier
 
