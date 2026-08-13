@@ -26,6 +26,10 @@ export class PassportSessionStrategy extends PassportStrategy(passport.Strategy,
     this.name = 'db-session';
   }
 
+  validate(user: SafeUser): SafeUser {
+    return user;
+  }
+
   authenticate(req: Express.Request): void {
     const request = req as Express.Request & {
       cookies?: Record<string, string | undefined>;
