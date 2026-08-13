@@ -34,7 +34,6 @@
     "prettier-plugin-tailwindcss": "^0.8.0"
   },
   "workspaces": [
-    "./app/*",
-    "./shared"
+    "./app/*"
   ]
 }

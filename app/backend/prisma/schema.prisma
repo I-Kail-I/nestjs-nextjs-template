@@ -5,6 +5,9 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  // NOTE: Only the "auth" schema is actually used — every model/enum targets it via
+  // @@schema("auth"). "public" is declared but currently empty. Keep it if you plan
+  // to add models to the default schema, otherwise it can be removed.
   schemas  = ["public", "auth"]
 }
 

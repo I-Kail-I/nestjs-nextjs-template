@@ -6,6 +6,7 @@ import helmet from 'helmet';
 import { AppModule } from '@/app.module';
 import { Logger } from 'nestjs-pino';
 import cookieParser from 'cookie-parser';
+import { AllExceptionsFilter } from '@/common/filter/http-exception.filter';
 import { PrismaClientExceptionFilter } from '@/common/filter/prisma-client-exception.filter';
 import { isDevelopment } from './utils/check-env';
 
@@ -18,8 +19,11 @@ async function bootstrap() {
 
   app.useLogger(app.get(Logger));
 
-  // Global filters
-  app.useGlobalFilters(new PrismaClientExceptionFilter());
+  // Global filters.
+  app.useGlobalFilters(
+    new AllExceptionsFilter(app.get(Logger)),
+    new PrismaClientExceptionFilter(),
+  );
 
   // Global pipes
   app.useGlobalPipes(
@@ -63,7 +67,7 @@ async function bootstrap() {
       .setTitle('My API')
       .setDescription('API description')
       .setVersion('1.0')
-      .addBearerAuth()
+      .addCookieAuth('session')
       .build();
 
     const document = SwaggerModule.createDocument(app, config);
