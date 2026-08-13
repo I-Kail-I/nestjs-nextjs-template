@@ -6,7 +6,7 @@ A production-ready full-stack monorepo with **NestJS 11** (backend) and **Next.j
 
 | Layer    | Tech                                                                       |
 | -------- | -------------------------------------------------------------------------- |
-| Backend  | NestJS 11, TypeScript, Prisma 7 + PostgreSQL, SWC, bcryptjs, Helmet        |
+| Backend  | NestJS 11, TypeScript, Prisma 7 + PostgreSQL, SWC, Passport (cookie sessions), bcryptjs, Helmet |
 | Frontend | Next.js 16, React 19, Tailwind v4, shadcn/ui (base-vega), Base UI         |
 | Data     | TanStack React Query, Zustand, Zod v4, Axios                              |
 | Logging  | Pino (nestjs-pino), Morgan HTTP middleware                                 |
@@ -22,7 +22,7 @@ A production-ready full-stack monorepo with **NestJS 11** (backend) and **Next.j
 ```bash
 npm install                          # install all the deps
 docker compose up -d                 # start Postgres & Redis
-npm --prefix app/backend run db:migrate-dev  # run Prisma migrations
+npm run db:migrate-dev --workspace=backend   # run Prisma migrations
 npm run dev                          # starts both backend & frontend
 ```
 
@@ -47,14 +47,15 @@ npm run dev                          # starts both backend & frontend
 │
 ├── .github/
 │   └── workflows/
-│       └── test.yml                  # CI: install → cache → parallel lint + test jobs
+│       └── test.yml                  # CI: parallel backend + frontend lint + test jobs
 │
 └── app/
     │
     ├── backend/                      # NestJS 11 API (port 8000)
     │   ├── package.json
     │   ├── package-lock.json
-    │   ├── tsconfig.json             # ESNext, decorators, path aliases (@/)
+    │   ├── .env.example              # Backend environment variables (PORT, DATABASE_URL, ...)
+    │   ├── tsconfig.json             # ES2023, nodenext, decorators, path aliases (@/)
     │   ├── tsconfig.build.json       # Build config (excludes tests, dist)
     │   ├── nest-cli.json             # SWC builder, deleteOutDir
     │   ├── prisma.config.ts          # Prisma 7 config (schema path, datasource from env)
@@ -62,25 +63,31 @@ npm run dev                          # starts both backend & frontend
     │   ├── Dockerfile                # Multi-stage: builder (npm ci + generate + build) → prod
     │   │
     │   ├── prisma/
-    │   │   ├── schema.prisma         # PostgreSQL datasource (schema: auth), User + Role enums
+    │   │   ├── schema.prisma         # PostgreSQL datasource (schema: auth), User + Session + Role enums
     │   │   └── migrations/
     │   │       ├── migration_lock.toml
     │   │       └── <timestamp>_initialize/
     │   │           └── migration.sql
     │   │
     │   ├── test/
-    │   │   └── jest-e2e.json         # E2E test runner config
+    │   │   ├── jest-e2e.json         # E2E test runner config
+    │   │   └── auth.e2e-spec.ts      # Auth E2E tests (register, login, session, delete-account)
     │   │
     │   └── src/
-    │       ├── main.ts                # App bootstrap: ValidationPipe, CORS, Helmet, cookie-parser, Swagger (dev), global prefix 'api'
+    │       ├── main.ts                # App bootstrap: ValidationPipe, Helmet, cookie-parser, Prisma exception filter, Swagger (dev), global prefix 'api'
     │       ├── app.module.ts          # Root module: ThrottlerModule (rate limiting), LoggerModule (Pino), MorganMiddleware, PrismaModule, AuthModule, HealthController
     │       │
     │       ├── common/
+    │       │   ├── decorators/
+    │       │   │   └── roles.decorator.ts        # @Roles() metadata decorator
+    │       │   ├── guards/
+    │       │   │   └── roles.guard.ts            # Role-based access control guard
     │       │   ├── prisma/
-    │       │   │   ├── prisma.module.ts         # @Global module, exports PrismaService
-    │       │   │   └── prisma.service.ts        # PrismaPg adapter, Pool connection, onModuleInit/onModuleDestroy lifecycle hooks
+    │       │   │   ├── prisma.module.ts          # @Global module, exports PrismaService
+    │       │   │   └── prisma.service.ts         # PrismaPg adapter, Pool connection, onModuleInit/onModuleDestroy lifecycle hooks
     │       │   ├── filter/
-    │       │   │   └── http-exception.filter.ts # Global exception filter (env-aware stack traces, structured errors)
+    │       │   │   ├── http-exception.filter.ts  # AllExceptionsFilter (env-aware stack traces, structured errors)
+    │       │   │   └── prisma-client-exception.filter.ts # Maps Prisma errors (e.g. P2002 → 409 Conflict)
     │       │   └── middleware/
     │       │       └── morgan.middleware.ts      # Morgan HTTP logger piped to Pino, excludes Swagger routes
     │       │
@@ -92,13 +99,16 @@ npm run dev                          # starts both backend & frontend
     │       │
     │       ├── modules/
     │       │   ├── auth/
-    │       │   │   ├── auth.module.ts         # Module definition
-    │       │   │   ├── auth.controller.ts     # POST register/login, DELETE delete
-    │       │   │   ├── auth.service.ts        # register (hash + create), login (compare), findOne, remove
-    │       │   │   ├── auth.controller.spec.ts # Controller unit tests (mocked service)
-    │       │   │   ├── auth.service.spec.ts    # Service unit tests (mocked Prisma + bcrypt)
+    │       │   │   ├── auth.module.ts              # Module definition (Passport + RolesGuard)
+    │       │   │   ├── auth.controller.ts          # register, login, me, logout, delete-account
+    │       │   │   ├── auth.service.ts             # register, login (DB session), logout, remove, findOne
+    │       │   │   ├── passport-session.guard.ts   # Passport AuthGuard('db-session')
+    │       │   │   ├── passport-session.strategy.ts # DB session strategy (cookie 'session', 7-day TTL)
+    │       │   │   ├── auth.controller.spec.ts     # Controller unit tests (mocked service)
+    │       │   │   ├── auth.service.spec.ts        # Service unit tests (mocked Prisma + bcrypt)
     │       │   │   └── dto/
-    │       │   │       └── create-auth.dto.ts # CreateAuthDto (first_name, last_name, email, password), LoginDto (email, password)
+    │       │   │       ├── auth.dto.ts             # RegisterDto, LoginDto (class-validator + Swagger)
+    │       │   │       └── response-auth.dto.ts    # AuthResponseDto, LoginSuccessDto
     │       │   │
     │       │   └── health/
     │       │       ├── health.controller.ts       # GET /api/health → { status: 'ok' }
@@ -198,14 +208,17 @@ Each module in `app/backend/src/modules/` follows standard NestJS structure:
 
 ```
 auth/
-├── auth.module.ts         # Module definition
-├── auth.controller.ts     # Route handlers (decorator-based)
-├── auth.service.ts        # Business logic (Prisma + bcrypt)
+├── auth.module.ts              # Module definition
+├── auth.controller.ts          # Route handlers (decorator-based)
+├── auth.service.ts             # Business logic (Prisma + bcrypt + DB sessions)
+├── passport-session.guard.ts   # AuthGuard('db-session') for protected routes
+├── passport-session.strategy.ts # Passport session strategy backed by the Session table
 ├── dto/
-│   └── create-auth.dto.ts # class-validator + @nestjs/swagger decorators
-├── auth.controller.spec.ts # Controller unit tests (mocked service)
-├── auth.service.spec.ts    # Service unit tests (mocked Prisma + bcrypt)
-└── *.e2e-spec.ts           # E2E tests (optional, under test/)
+│   ├── auth.dto.ts             # RegisterDto, LoginDto (class-validator + @nestjs/swagger)
+│   └── response-auth.dto.ts    # AuthResponseDto, LoginSuccessDto
+├── auth.controller.spec.ts     # Controller unit tests (mocked service)
+├── auth.service.spec.ts        # Service unit tests (mocked Prisma + bcrypt)
+└── *.e2e-spec.ts               # E2E tests (under test/)
 ```
 
 ## API Documentation
@@ -216,8 +229,10 @@ In development mode, Swagger UI is available at `/api/docs`. Endpoints:
 | ------ | ------------------------- | -------------------- |
 | GET    | `/api/health`             | Health check         |
 | POST   | `/api/auth/register/email-password` | Register user |
-| POST   | `/api/auth/login/email-password`    | Login (validate credentials) |
-| DELETE | `/api/auth/delete/:email` | Delete user          |
+| POST   | `/api/auth/login/email-password`    | Login (sets session cookie) |
+| POST   | `/api/auth/logout`        | Logout (revokes session) |
+| GET    | `/api/auth/me`            | Current user (session required) |
+| DELETE | `/api/auth/delete-account`| Delete current user (session required) |
 
 ## Environment Variables
 
@@ -236,21 +251,32 @@ REDIS_PASSWORD=your_redis_password
 
 # Domain (production)
 DOMAIN=your-domain.com
+```
 
-# Backend
-NODE_ENV=development            # development | production
-CHOKIDAR_USEPOLLING=true        # Hot reload in Docker
+### Backend `.env`
+
+Located at `app/backend/.env.example`:
+
+```ini
+# Backend environment
+NODE_ENV=development
+CHOKIDAR_USEPOLLING=true            # Hot reload in Docker
 CHOKIDAR_INTERVAL=1000
-BACKEND_PORT=8000
-DATABASE_URL=postgresql://username:password@localhost:5432/mydatabase
-REDIS_URL=redis://:my_secure_password@localhost:6379/0
-JWT_SECRET=your-secret-key-change-this
-FRONTEND_URL=http://backend:3000
 
-# Frontend
-FRONTEND_PORT=3000
-API_URL=http://backend:8000/api
-NEXT_PUBLIC_API_PREFIX=/api
+# Server
+PORT=8000
+
+# Database
+DATABASE_URL=postgresql://username:password@localhost:5432/mydatabase
+
+# Cache
+REDIS_URL=redis://:my_secure_password@localhost:6379/0
+
+# Auth
+JWT_SECRET=your-secret-key-change-this
+
+# Frontend connection
+FRONTEND_URL=http://backend:3000
 ```
 
 ### Frontend `.env` (local override)
@@ -327,13 +353,10 @@ NEXT_PUBLIC_API_PREFIX=/api
 
 ## CI/CD
 
-GitHub Actions (`.github/workflows/test.yml`) runs on every push and pull request:
+GitHub Actions (`.github/workflows/test.yml`) runs on every push and pull request with two parallel jobs:
 
-1. **Root** — installs all dependencies (`npm ci`), caches `node_modules` across jobs
-2. **Backend** — restores cache, `db:generate`, `lint`, `test`
-3. **Frontend** — restores cache, `lint`, `test`
-
-Backend and frontend jobs run in parallel for speed.
+- **Backend** — installs dependencies (`npm ci` at the repo root), then runs `db:generate`, `lint`, and `test`
+- **Frontend** — installs dependencies (`npm ci`), then runs `lint` and `test`
 
 ## Prisma Schema
 
@@ -355,16 +378,31 @@ enum Role {
 }
 
 model User {
-  id         String   @id @default(uuid())
+  id         String    @id @default(uuid())
   first_name String
   last_name  String
-  email      String   @unique
+  email      String    @unique
   password   String
-  role       Role     @default(user)
-  is_active  Boolean  @default(true)
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  role       Role      @default(user)
+  is_active  Boolean   @default(true)
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  sessions   Session[]
+
   @@map("users")
+  @@schema("auth")
+}
+
+model Session {
+  id         String   @id @default(uuid())
+  user_id    String
+  expires_at DateTime
+  created_at DateTime @default(now())
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([expires_at])
+  @@map("sessions")
   @@schema("auth")
 }
 ```
@@ -372,21 +410,24 @@ model User {
 Key details:
 
 - Uses Prisma PostgreSQL adapter (`@prisma/adapter-pg`) with `pg` Pool for connection pooling
-- User table lives under `auth` schema (`@@schema("auth")`)
+- `User` and `Session` tables live under the `auth` schema (`@@schema("auth")`)
+- `Session` model backs cookie-based auth (opaque token, 7-day TTL, cascade delete on user removal)
 - Client output goes to `src/generated/prisma/` (gitignored, auto-generated)
 - Prisma config via `prisma.config.ts` (Prisma v7 config file format)
 
 ## Production Deployment
 
-The production stack (`docker-compose.prod.yml`) includes three services:
+The production stack (`docker-compose.prod.yml`) includes five services:
 
 | Service  | Role                            | Ports         |
 | -------- | ------------------------------- | ------------- |
 | **Caddy**   | Reverse proxy + automatic HTTPS | 80, 443       |
 | **Backend** | NestJS API (compiled, no dev deps) | 8000 (internal) |
 | **Frontend**| Next.js (built .next, no dev deps) | 3000 (internal) |
+| **Database**| PostgreSQL 17                  | 5432 (internal) |
+| **Cache**   | Redis 8                        | 6379 (internal) |
 
-Caddy routes `/api/*` to the backend and everything else to the frontend. Each service runs with JSON file logging (10MB max, 3 files retained). The backend exposes a health check endpoint for container orchestration.
+Caddy routes `/api/*` to the backend and everything else to the frontend. Each service runs with JSON file logging (10MB max, 3 files retained). The backend exposes a health check endpoint for container orchestration. The database and cache services are bundled for convenience — the compose file recommends managing them externally (e.g. AWS RDS / ElastiCache) in real production.
 
 ## Tooling
 
