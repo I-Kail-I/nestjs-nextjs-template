@@ -41,7 +41,6 @@ export default antfu(
 
       // Relaxed TypeScript rules (global)
       'ts/consistent-type-imports': 'off',
-      'ts/strict-boolean-expressions': 'off',
       'ts/no-unsafe-assignment': 'off',
       'ts/no-unsafe-argument': 'off',
       'ts/no-unsafe-member-access': 'off',
@@ -50,6 +49,7 @@ export default antfu(
       'ts/no-misused-promises': 'off',
       'ts/restrict-template-expressions': 'off',
       'ts/no-empty-function': ['error', { allow: ['constructors'] }],
+      "ts/strict-boolean-expressions": "off",
 
       // Tool-specific
       'react-refresh/only-export-components': 'off',
@@ -65,7 +65,6 @@ export default antfu(
       'ts/consistent-type-imports': 'off',
 
       // Strict type safety for backend (override global relaxed settings)
-      'ts/strict-boolean-expressions': 'error',
       'ts/no-unsafe-assignment': 'error',
       'ts/no-unsafe-argument': 'error',
       'ts/no-unsafe-member-access': 'error',
@@ -88,7 +87,6 @@ export default antfu(
       'style/jsx-one-expression-per-line': 'off',
 
       // Already relaxed globally, but explicitly shown for frontend context
-      'ts/strict-boolean-expressions': 'off',
       'ts/no-unsafe-assignment': 'off',
       'ts/no-unsafe-argument': 'off',
       'ts/no-unsafe-member-access': 'off',

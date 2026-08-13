@@ -5,7 +5,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  schemas = ["public", "auth"]
+  schemas  = ["public", "auth"]
 }
 
 enum Role {
@@ -16,16 +16,30 @@ enum Role {
 }
 
 model User {
-  id         String   @id @default(uuid())
+  id         String    @id @default(uuid())
   first_name String
   last_name  String
-  email      String   @unique
+  email      String    @unique
   password   String
-  role       Role     @default(user)
-  is_active  Boolean  @default(true)
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  role       Role      @default(user)
+  is_active  Boolean   @default(true) // This row incase if you want to implementing banning, delete this row if you dont need it
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  sessions   Session[]
 
   @@map("users")
+  @@schema("auth")
+}
+
+model Session {
+  id         String   @id @default(uuid())
+  user_id    String
+  expires_at DateTime
+  created_at DateTime @default(now())
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([expires_at])
+  @@map("sessions")
   @@schema("auth")
 }

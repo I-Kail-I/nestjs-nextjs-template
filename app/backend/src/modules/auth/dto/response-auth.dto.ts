@@ -22,3 +22,8 @@ export class AuthResponseDto {
   @ApiProperty({ example: '2026-01-15T10:00:00.000Z' })
   updated_at!: Date;
 }
+
+export class LoginSuccessDto extends AuthResponseDto {
+  @ApiProperty()
+  expires_at!: Date;
+}
