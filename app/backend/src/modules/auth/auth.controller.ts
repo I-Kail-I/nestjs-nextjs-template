@@ -21,11 +21,12 @@ export class AuthController {
   @Post('login/email-password')
   async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Response) {
     const result = await this.authService.login(loginDto);
-    res.cookie(passportSessionStrategy.SESSION_COOKIE, result.session_token, {
+    const { session_token, ...publicResult } = result;
+    res.cookie(passportSessionStrategy.SESSION_COOKIE, session_token, {
       ...passportSessionStrategy.sessionCookieOptions,
       maxAge: result.expires_at.getTime() - Date.now(),
     });
-    return result;
+    return publicResult;
   }
 
   @ApiOkResponse({ type: AuthResponseDto })
@@ -37,18 +38,30 @@ export class AuthController {
 
   @UseGuards(PassportSessionGuard)
   @Post('logout')
-  async logout(@Req() req: passportSessionStrategy.AuthenticatedRequest, @Res({ passthrough: true }) res: Response) {
+  async logout(
+    @Req() req: passportSessionStrategy.AuthenticatedRequest,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     await this.authService.logout(req.cookies?.[passportSessionStrategy.SESSION_COOKIE]);
-    res.clearCookie(passportSessionStrategy.SESSION_COOKIE, passportSessionStrategy.sessionCookieOptions);
+    res.clearCookie(
+      passportSessionStrategy.SESSION_COOKIE,
+      passportSessionStrategy.sessionCookieOptions,
+    );
     return { message: 'Logged out successfully' };
   }
 
   @ApiOkResponse({ type: AuthResponseDto })
   @UseGuards(PassportSessionGuard)
   @Delete('delete-account')
-  async remove(@Req() req: passportSessionStrategy.AuthenticatedRequest, @Res({ passthrough: true }) res: Response) {
+  async remove(
+    @Req() req: passportSessionStrategy.AuthenticatedRequest,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const result = await this.authService.remove(req.user.id);
-    res.clearCookie(passportSessionStrategy.SESSION_COOKIE, passportSessionStrategy.sessionCookieOptions);
+    res.clearCookie(
+      passportSessionStrategy.SESSION_COOKIE,
+      passportSessionStrategy.sessionCookieOptions,
+    );
     return result;
   }
 }

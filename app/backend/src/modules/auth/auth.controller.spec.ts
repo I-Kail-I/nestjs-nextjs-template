@@ -92,7 +92,7 @@ describe('AuthController', () => {
   });
 
   describe('login', () => {
-    it('should call authService.login and return the result', async () => {
+    it('should set session cookie and omit token from response', async () => {
       const loginDto = { email: 'test@example.com', password: '123456' };
       const expected = {
         ...createUser(),
@@ -107,7 +107,11 @@ describe('AuthController', () => {
 
       const result = await controller.login(loginDto, response);
 
-      expect(result).toEqual(expected);
+      expect(result).toEqual({
+        ...createUser(),
+        expires_at: expected.expires_at,
+      });
+      expect(result).not.toHaveProperty('session_token');
       expect(mockAuthService.login).toHaveBeenCalledWith(loginDto);
       expect(response.cookie).toHaveBeenCalledWith(SESSION_COOKIE, 'session-1', {
         ...sessionCookieOptions,

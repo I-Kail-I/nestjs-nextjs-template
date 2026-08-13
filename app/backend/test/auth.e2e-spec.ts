@@ -25,7 +25,6 @@ interface UserResponse {
   created_at?: string;
   updated_at?: string;
   password?: unknown;
-  session_token?: string;
   expires_at?: string;
 }
 
@@ -259,7 +258,7 @@ describe('Auth API (e2e)', () => {
 
       expectSafeUser(response, registration);
       const body = response.body as UserResponse;
-      expect(body.session_token).toEqual(expect.any(String));
+      expect(body).not.toHaveProperty('session_token');
       expect(body.expires_at).toEqual(expect.any(String));
       expect(response.headers['set-cookie']).toEqual(
         expect.arrayContaining([expect.stringContaining('session=')]),

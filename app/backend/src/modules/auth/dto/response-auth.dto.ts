@@ -25,8 +25,5 @@ export class AuthResponseDto {
 
 export class LoginSuccessDto extends AuthResponseDto {
   @ApiProperty()
-  session_token!: string;
-
-  @ApiProperty()
   expires_at!: Date;
 }

@@ -11,6 +11,8 @@ import { LoginDto, RegisterDto } from './dto/auth.dto';
 import { AuthResponseDto, LoginSuccessDto } from './dto/response-auth.dto';
 import { SESSION_TTL_MS } from './passport-session.strategy';
 
+type LoginResult = LoginSuccessDto & { session_token: string };
+
 @Injectable()
 export class AuthService {
   constructor(private readonly prisma: PrismaService) {}
@@ -45,7 +47,7 @@ export class AuthService {
     return user;
   }
 
-  async login(loginDto: LoginDto): Promise<LoginSuccessDto> {
+  async login(loginDto: LoginDto): Promise<LoginResult> {
     const user = await this.findOne(loginDto.email);
 
     const checkPassword = await comparePassword(loginDto.password, user.password);
