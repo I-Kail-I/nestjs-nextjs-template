@@ -23,6 +23,7 @@
     ],
     "allowJs": true,
     "strict": true,
+    "noEmit": true,
     "esModuleInterop": true,
     "isolatedModules": true,
     "skipLibCheck": true,
@@ -30,8 +31,7 @@
       {
         "name": "next"
       }
-    ],
-    "noEmit": true
+    ]
   },
   "include": [
     "next-env.d.ts",
