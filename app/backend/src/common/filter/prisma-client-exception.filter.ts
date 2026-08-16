@@ -13,10 +13,9 @@ export class PrismaClientExceptionFilter implements ExceptionFilter {
       // (if the user put a record that already exists)
       case 'P2002': {
         const status = HttpStatus.CONFLICT;
-        const target = (exception.meta?.target as string[])?.join(', ') || 'field';
         response.status(status).json({
           statusCode: status,
-          message: `A record with this ${target} already exists.`,
+          message: 'The record already exists',
           error: 'Conflict',
         });
         break;
@@ -26,7 +25,7 @@ export class PrismaClientExceptionFilter implements ExceptionFilter {
         const status = HttpStatus.NOT_FOUND;
         response.status(status).json({
           statusCode: status,
-          message: 'Record not found',
+          message: 'The record was not found',
           error: 'Not Found',
         });
         break;

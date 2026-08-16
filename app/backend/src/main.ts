@@ -7,6 +7,7 @@ import { AppModule } from '@/app.module';
 import { Logger } from 'nestjs-pino';
 import cookieParser from 'cookie-parser';
 import { isDevelopment } from './utils/check-env';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -55,8 +56,6 @@ async function bootstrap() {
 
   // This is for the swagger docs, it by default is only available in development
   if (isDevelopment) {
-    const { DocumentBuilder, SwaggerModule } = await import('@nestjs/swagger');
-
     const config = new DocumentBuilder()
       .setTitle('My API')
       .setDescription('API description')
@@ -65,7 +64,7 @@ async function bootstrap() {
       .build();
 
     const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('api/docs', app, document);
+    SwaggerModule.setup('api-docs', app, document);
   }
 
   await app.listen(PORT);
