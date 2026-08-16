@@ -6,8 +6,6 @@ import helmet from 'helmet';
 import { AppModule } from '@/app.module';
 import { Logger } from 'nestjs-pino';
 import cookieParser from 'cookie-parser';
-import { AllExceptionsFilter } from '@/common/filter/http-exception.filter';
-import { PrismaClientExceptionFilter } from '@/common/filter/prisma-client-exception.filter';
 import { isDevelopment } from './utils/check-env';
 
 async function bootstrap() {
@@ -17,13 +15,9 @@ async function bootstrap() {
 
   const PORT: number = Number(process.env.PORT ?? 8000);
 
+  // Enable and app using helper
   app.useLogger(app.get(Logger));
-
-  // Global filters.
-  app.useGlobalFilters(
-    new AllExceptionsFilter(app.get(Logger)),
-    new PrismaClientExceptionFilter(),
-  );
+  app.enableShutdownHooks();
 
   // Global pipes
   app.useGlobalPipes(

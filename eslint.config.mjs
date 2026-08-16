@@ -49,7 +49,7 @@ export default antfu(
       'ts/no-misused-promises': 'off',
       'ts/restrict-template-expressions': 'off',
       'ts/no-empty-function': ['error', { allow: ['constructors'] }],
-      "ts/strict-boolean-expressions": "off",
+      'ts/strict-boolean-expressions': 'off',
 
       // Tool-specific
       'react-refresh/only-export-components': 'off',

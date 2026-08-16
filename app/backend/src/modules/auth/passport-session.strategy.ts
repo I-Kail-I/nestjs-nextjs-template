@@ -2,7 +2,7 @@ import type { User } from '@/generated/prisma/client';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import passport from 'passport';
-import { PrismaService } from '@/common/prisma/prisma.service';
+import { PrismaService } from '@/lib/prisma/prisma.service';
 import { isProduction } from '@/utils/check-env';
 
 export type SafeUser = Omit<User, 'password'>;

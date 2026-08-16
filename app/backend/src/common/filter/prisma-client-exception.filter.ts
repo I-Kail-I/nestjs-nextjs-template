@@ -9,6 +9,8 @@ export class PrismaClientExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
 
     switch (exception.code) {
+      // Status for unique constraint violation
+      // (if the user put a record that already exists)
       case 'P2002': {
         const status = HttpStatus.CONFLICT;
         const target = (exception.meta?.target as string[])?.join(', ') || 'field';
@@ -16,6 +18,16 @@ export class PrismaClientExceptionFilter implements ExceptionFilter {
           statusCode: status,
           message: `A record with this ${target} already exists.`,
           error: 'Conflict',
+        });
+        break;
+      }
+      // Status for record not found
+      case 'P2025': {
+        const status = HttpStatus.NOT_FOUND;
+        response.status(status).json({
+          statusCode: status,
+          message: 'Record not found',
+          error: 'Not Found',
         });
         break;
       }

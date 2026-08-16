@@ -10,7 +10,7 @@ import {
   sessionCookieOptions,
 } from './passport-session.strategy';
 
-jest.mock('@/common/prisma/prisma.service', () => ({
+jest.mock('@/lib/prisma/prisma.service', () => ({
   PrismaService: jest.fn().mockImplementation(() => ({
     user: {
       findUnique: jest.fn(),
