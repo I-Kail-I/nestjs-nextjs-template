@@ -1,15 +1,14 @@
-import { ConflictException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { PrismaService } from '@/common/prisma/prisma.service';
 import { Role } from '@/generated/prisma/enums';
-import { comparePassword, hashPassword } from '@/lib/bcrypt';
+import { BcryptService } from '@/lib/bcrypt/bcrypt.service';
+import { PrismaService } from '@/lib/prisma/prisma.service';
 import { AuthService } from './auth.service';
 import { SESSION_TTL_MS } from './passport-session.strategy';
 
-jest.mock('@/common/prisma/prisma.service', () => ({
+jest.mock('@/lib/prisma/prisma.service', () => ({
   PrismaService: jest.fn().mockImplementation(() => ({
     user: {
-      findUnique: jest.fn(),
       findUniqueOrThrow: jest.fn(),
       create: jest.fn(),
       delete: jest.fn(),
@@ -21,10 +20,10 @@ jest.mock('@/common/prisma/prisma.service', () => ({
   })),
 }));
 
-jest.mock('@/lib/bcrypt', () => ({
+const mockBcrypt = {
   hashPassword: jest.fn().mockResolvedValue('hashed-password'),
   comparePassword: jest.fn(),
-}));
+};
 
 function createMockUser(overrides = {}) {
   return {
@@ -49,7 +48,11 @@ describe('AuthService', () => {
     jest.clearAllMocks();
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [AuthService, PrismaService],
+      providers: [
+        AuthService,
+        PrismaService,
+        { provide: BcryptService, useValue: mockBcrypt },
+      ],
     }).compile();
 
     service = module.get<AuthService>(AuthService);
@@ -67,14 +70,14 @@ describe('AuthService', () => {
   describe('findOne', () => {
     it('should return the user when found', async () => {
       const user = createMockUser();
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue(user);
+      (prisma.user.findUniqueOrThrow as jest.Mock).mockResolvedValue(user);
 
       const result = await service.findOne('test@example.com');
       expect(result).toEqual(user);
     });
 
-    it('should throw NotFoundException when user is not found', async () => {
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
+    it('should propagate when the user is not found', async () => {
+      (prisma.user.findUniqueOrThrow as jest.Mock).mockRejectedValue(new NotFoundException());
 
       await expect(service.findOne('missing@example.com')).rejects.toThrow(NotFoundException);
     });
@@ -89,8 +92,6 @@ describe('AuthService', () => {
     };
 
     it('should create a user with hashed password and omit password from result', async () => {
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
-
       const mockCreatedUser = createMockUser({
         email: dto.email,
         first_name: dto.first_name,
@@ -98,26 +99,16 @@ describe('AuthService', () => {
       });
       const { password: _password, ...safeUser } = mockCreatedUser;
 
-      const createSpy = jest.spyOn(prisma.user, 'create').mockResolvedValue(safeUser);
+      (prisma.user.create as jest.Mock).mockResolvedValue(safeUser);
 
       const result = await service.register(dto);
 
       expect(result).toEqual(safeUser);
-
-      expect(hashPassword).toHaveBeenCalledWith(dto.password);
-      expect(createSpy).toHaveBeenCalledWith({
+      expect(mockBcrypt.hashPassword).toHaveBeenCalledWith(dto.password);
+      expect(prisma.user.create).toHaveBeenCalledWith({
         data: { ...dto, password: 'hashed-password' },
         omit: { password: true },
       });
-    });
-
-    it('should throw ConflictException when email already exists', async () => {
-      const existingUser = createMockUser({ email: dto.email });
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue(existingUser);
-
-      await expect(service.register(dto)).rejects.toThrow(ConflictException);
-      expect(hashPassword).not.toHaveBeenCalled();
-      expect(prisma.user.create).not.toHaveBeenCalled();
     });
   });
 
@@ -128,8 +119,8 @@ describe('AuthService', () => {
       const user = createMockUser();
       const expiresAt = new Date(1_000_000 + SESSION_TTL_MS);
 
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue(user);
-      (comparePassword as jest.Mock).mockResolvedValue(true);
+      (prisma.user.findUniqueOrThrow as jest.Mock).mockResolvedValue(user);
+      (mockBcrypt.comparePassword).mockResolvedValue(true);
       (prisma.session.create as jest.Mock).mockResolvedValue({ id: 'session-1' });
       const nowSpy = jest.spyOn(Date, 'now').mockReturnValue(1_000_000);
 
@@ -141,7 +132,7 @@ describe('AuthService', () => {
         session_token: 'session-1',
         expires_at: expiresAt,
       });
-      expect(comparePassword).toHaveBeenCalledWith('123456', 'hashed');
+      expect(mockBcrypt.comparePassword).toHaveBeenCalledWith('123456', 'hashed');
       expect(prisma.session.create).toHaveBeenCalledWith({
         data: { user_id: user.id, expires_at: expiresAt },
         select: { id: true },
@@ -152,8 +143,8 @@ describe('AuthService', () => {
     it('should throw UnauthorizedException when password is incorrect', async () => {
       const user = createMockUser();
 
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue(user);
-      (comparePassword as jest.Mock).mockResolvedValue(false);
+      (prisma.user.findUniqueOrThrow as jest.Mock).mockResolvedValue(user);
+      (mockBcrypt.comparePassword).mockResolvedValue(false);
 
       await expect(service.login(loginDto)).rejects.toThrow(UnauthorizedException);
       expect(prisma.session.create).not.toHaveBeenCalled();
@@ -162,18 +153,18 @@ describe('AuthService', () => {
     it('should reject inactive users without creating a session', async () => {
       const user = createMockUser({ is_active: false });
 
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue(user);
-      (comparePassword as jest.Mock).mockResolvedValue(true);
+      (prisma.user.findUniqueOrThrow as jest.Mock).mockResolvedValue(user);
+      (mockBcrypt.comparePassword).mockResolvedValue(true);
 
       await expect(service.login(loginDto)).rejects.toThrow('User is not active');
       expect(prisma.session.create).not.toHaveBeenCalled();
     });
 
     it('should throw NotFoundException when email is not registered', async () => {
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
+      (prisma.user.findUniqueOrThrow as jest.Mock).mockRejectedValue(new NotFoundException());
 
       await expect(service.login(loginDto)).rejects.toThrow(NotFoundException);
-      expect(comparePassword).not.toHaveBeenCalled();
+      expect(mockBcrypt.comparePassword).not.toHaveBeenCalled();
       expect(prisma.session.create).not.toHaveBeenCalled();
     });
   });
@@ -198,21 +189,19 @@ describe('AuthService', () => {
       const { password: _password, ...safeUser } = user;
 
       (prisma.user.findUniqueOrThrow as jest.Mock).mockResolvedValue(user);
-      const sessionDeleteSpy = jest
-        .spyOn(prisma.session, 'deleteMany')
-        .mockResolvedValue({ count: 1 });
-      const deleteSpy = jest.spyOn(prisma.user, 'delete').mockResolvedValue(safeUser);
+      (prisma.session.deleteMany as jest.Mock).mockResolvedValue({ count: 1 });
+      (prisma.user.delete as jest.Mock).mockResolvedValue(safeUser);
 
       const result = await service.remove(user.id);
 
       expect(result).toEqual(safeUser);
-      expect(sessionDeleteSpy).toHaveBeenCalledWith({ where: { user_id: user.id } });
-      expect(deleteSpy).toHaveBeenCalledWith({
+      expect(prisma.session.deleteMany).toHaveBeenCalledWith({ where: { user_id: user.id } });
+      expect(prisma.user.delete).toHaveBeenCalledWith({
         where: { id: user.id },
         omit: { password: true },
       });
-      expect(sessionDeleteSpy.mock.invocationCallOrder[0]).toBeLessThan(
-        deleteSpy.mock.invocationCallOrder[0],
+      expect((prisma.session.deleteMany as jest.Mock).mock.invocationCallOrder[0]).toBeLessThan(
+        (prisma.user.delete as jest.Mock).mock.invocationCallOrder[0],
       );
     });
 

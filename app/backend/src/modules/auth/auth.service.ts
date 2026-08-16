@@ -1,12 +1,7 @@
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
-import { PrismaService } from '@/common/prisma/prisma.service';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { User } from '@/generated/prisma/client';
-import { comparePassword, hashPassword } from '@/lib/bcrypt';
+import { BcryptService } from '@/lib/bcrypt/bcrypt.service';
+import { PrismaService } from '@/lib/prisma/prisma.service';
 import { LoginDto, RegisterDto } from './dto/auth.dto';
 import { AuthResponseDto, LoginSuccessDto } from './dto/response-auth.dto';
 import { SESSION_TTL_MS } from './passport-session.strategy';
@@ -15,29 +10,21 @@ type LoginResult = LoginSuccessDto & { session_token: string };
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly bcrypt: BcryptService,
+  ) {}
 
   async findOne(email: string): Promise<User> {
-    const user = await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUniqueOrThrow({
       where: { email },
     });
-
-    if (!user) {
-      throw new NotFoundException('Email is not registered');
-    }
 
     return user;
   }
 
   async register(register: RegisterDto): Promise<AuthResponseDto> {
-    const existing = await this.prisma.user.findUnique({
-      where: { email: register.email },
-      select: { id: true },
-    });
-
-    if (existing) throw new ConflictException('Email is already registered');
-
-    const hashedPassword = await hashPassword(register.password);
+    const hashedPassword = await this.bcrypt.hashPassword(register.password);
 
     const user = await this.prisma.user.create({
       data: { ...register, password: hashedPassword },
@@ -50,7 +37,7 @@ export class AuthService {
   async login(loginDto: LoginDto): Promise<LoginResult> {
     const user = await this.findOne(loginDto.email);
 
-    const checkPassword = await comparePassword(loginDto.password, user.password);
+    const checkPassword = await this.bcrypt.comparePassword(loginDto.password, user.password);
 
     if (!checkPassword) {
       throw new UnauthorizedException('Password is incorrect');

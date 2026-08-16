@@ -4,7 +4,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import request from 'supertest';
 import { AppModule } from '@/app.module';
-import { PrismaService } from '@/common/prisma/prisma.service';
+import { PrismaService } from '@/lib/prisma/prisma.service';
 
 const testEmailPrefix = `auth-e2e-${process.pid}-${Date.now()}`;
 const validPassword = 'P@ssw0';
