@@ -1,10 +1,11 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { LoggerModule } from 'nestjs-pino';
+import { PrismaClientExceptionFilter } from './common/filter/prisma-client-exception.filter';
 import { MorganMiddleware } from './common/middleware/morgan.middleware';
-import { PrismaModule } from './common/prisma/prisma.module';
-import { RedisModule } from './common/redis/redis.module';
+import { PrismaModule } from './lib/prisma/prisma.module';
+import { RedisModule } from './lib/redis/redis.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { HealthController } from './modules/health/health.controller';
 import { isProduction } from './utils/check-env';
@@ -45,6 +46,10 @@ import { isProduction } from './utils/check-env';
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: PrismaClientExceptionFilter,
     },
   ],
   controllers: [HealthController],
