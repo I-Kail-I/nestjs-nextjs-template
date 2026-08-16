@@ -12,12 +12,17 @@ import { isProduction } from './utils/check-env';
 
 @Module({
   imports: [
-    // Rate limiting (10 requests per 60s window)
+    // Rate limiting
     ThrottlerModule.forRoot([
-      {
-        ttl: 60000,
-        limit: 10,
-      },
+      isProduction
+        ? {
+            ttl: 60000,
+            limit: 30,
+          }
+        : {
+            ttl: 60000,
+            limit: 1000,
+          },
     ]),
 
     // Structured logging (Pino + Morgan)
@@ -58,7 +63,6 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(MorganMiddleware)
-      .exclude('api/docs', 'api/docs/(.*)') // Skip Swagger routes
       .forRoutes('*');
   }
 }
