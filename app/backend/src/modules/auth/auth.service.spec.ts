@@ -48,11 +48,7 @@ describe('AuthService', () => {
     jest.clearAllMocks();
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        AuthService,
-        PrismaService,
-        { provide: BcryptService, useValue: mockBcrypt },
-      ],
+      providers: [AuthService, PrismaService, { provide: BcryptService, useValue: mockBcrypt }],
     }).compile();
 
     service = module.get<AuthService>(AuthService);
@@ -120,7 +116,7 @@ describe('AuthService', () => {
       const expiresAt = new Date(1_000_000 + SESSION_TTL_MS);
 
       (prisma.user.findUniqueOrThrow as jest.Mock).mockResolvedValue(user);
-      (mockBcrypt.comparePassword).mockResolvedValue(true);
+      mockBcrypt.comparePassword.mockResolvedValue(true);
       (prisma.session.create as jest.Mock).mockResolvedValue({ id: 'session-1' });
       const nowSpy = jest.spyOn(Date, 'now').mockReturnValue(1_000_000);
 
@@ -144,7 +140,7 @@ describe('AuthService', () => {
       const user = createMockUser();
 
       (prisma.user.findUniqueOrThrow as jest.Mock).mockResolvedValue(user);
-      (mockBcrypt.comparePassword).mockResolvedValue(false);
+      mockBcrypt.comparePassword.mockResolvedValue(false);
 
       await expect(service.login(loginDto)).rejects.toThrow(UnauthorizedException);
       expect(prisma.session.create).not.toHaveBeenCalled();
@@ -154,7 +150,7 @@ describe('AuthService', () => {
       const user = createMockUser({ is_active: false });
 
       (prisma.user.findUniqueOrThrow as jest.Mock).mockResolvedValue(user);
-      (mockBcrypt.comparePassword).mockResolvedValue(true);
+      mockBcrypt.comparePassword.mockResolvedValue(true);
 
       await expect(service.login(loginDto)).rejects.toThrow('User is not active');
       expect(prisma.session.create).not.toHaveBeenCalled();

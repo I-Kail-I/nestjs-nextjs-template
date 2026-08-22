@@ -5,6 +5,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "format": "npm run format:frontend --prefix ../..",
     "lint": "npm run lint:frontend --prefix ../..",
     "test": "jest",
     "test:watch": "jest --watch",

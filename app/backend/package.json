@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "scripts": {
     "build": "nest build",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "format": "npm run format:backend --prefix ../..",
     "lint": "npm run lint:backend --prefix ../..",
     "start": "nest start",
     "start:dev": "nest start --watch",
