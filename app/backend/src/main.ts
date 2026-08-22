@@ -1,4 +1,3 @@
-/* eslint-disable perfectionist/sort-imports */
 import 'dotenv/config';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';

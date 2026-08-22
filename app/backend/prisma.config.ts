@@ -1,4 +1,3 @@
-/* eslint-disable perfectionist/sort-imports */
 import 'dotenv/config';
 import { defineConfig } from 'prisma/config';
 

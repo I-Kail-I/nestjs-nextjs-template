@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { UserContainer } from './_components/user-container';
 import { useUser } from './_hooks/hooks.client';
 

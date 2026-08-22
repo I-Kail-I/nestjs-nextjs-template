@@ -36,7 +36,10 @@ export class PassportSessionStrategy extends PassportStrategy(passport.Strategy,
     };
     const token = request.cookies?.[SESSION_COOKIE];
 
-    if (token == null) return this.fail(new UnauthorizedException('Not authenticated'), 401);
+    if (token == null) {
+      this.fail(new UnauthorizedException('Not authenticated'), 401);
+      return;
+    }
 
     void this.prisma.session
       .findUnique({
@@ -44,7 +47,7 @@ export class PassportSessionStrategy extends PassportStrategy(passport.Strategy,
         include: { user: true },
       })
       .then(async (session) => {
-        if (!session || !session.user.is_active) {
+        if (!session?.user.is_active) {
           return this.fail(new UnauthorizedException('Invalid session'), 401);
         }
         if (session.expires_at.getTime() < Date.now()) {

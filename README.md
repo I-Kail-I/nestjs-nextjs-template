@@ -34,8 +34,7 @@ npm run dev                          # starts both backend & frontend
 ├── .env.example                      # Environment variable template
 ├── .gitignore                        # Root gitignore
 ├── .nvmrc                            # Node.js 24.15.0
-├── .prettierrc                       # Prettier config (Tailwind plugin, prose wrap)
-├── eslint.config.mjs                 # @antfu/eslint-config (global + per-tier overrides)
+├── biome.json                        # Biome config (formatter + linter, overrides)
 ├── tsconfig.json                     # TypeScript project references (frontend + backend)
 ├── package.json                      # Root workspace (concurrently, lint, format, test)
 ├── package-lock.json
@@ -302,17 +301,19 @@ NEXT_PUBLIC_API_PREFIX=/api
 | `npm run dev`             | Run backend + frontend concurrently |
 | `npm run dev:backend`     | Backend only (port 8000)            |
 | `npm run dev:frontend`    | Frontend only (port 3000)           |
-| `npm run lint`            | ESLint (both projects)              |
-| `npm run lint:fix`        | ESLint auto-fix                     |
-| `npm run lint:backend`    | ESLint (backend only)               |
-| `npm run lint:frontend`   | ESLint (frontend only)              |
+| `npm run lint`            | Biome lint (both projects)          |
+| `npm run lint:fix`        | Biome lint auto-fix                 |
+| `npm run lint:backend`    | Biome lint (backend only)           |
+| `npm run lint:frontend`   | Biome lint (frontend only)          |
 | `npm run test`            | Run all tests (backend → frontend)  |
 | `npm run test:backend`    | Backend unit tests                  |
 | `npm run test:frontend`   | Frontend unit tests                 |
-| `npm run format`          | Prettier (all files)                |
-| `npm run format:check`    | Prettier check only                 |
-| `npm run format:backend`  | Prettier (backend only)             |
-| `npm run format:frontend` | Prettier (frontend only)            |
+| `npm run format`          | Biome check --write (all files)     |
+| `npm run format:check`    | Biome check                         |
+| `npm run format:backend`  | Biome check --write (backend only)  |
+| `npm run format:frontend` | Biome check --write (frontend only) |
+| `npm run check`           | Biome check (lint + format)         |
+| `npm run check:fix`       | Biome check --write                 |
 
 ### Docker
 
@@ -502,26 +503,15 @@ background connection attempt:
 
 ## Tooling
 
-### ESLint
+### Biome
 
-Single config (`eslint.config.mjs`) using `@antfu/eslint-config` with
-tier-specific overrides:
+Single config (`biome.json`) for formatter and linter with overrides:
 
-- **Global** — relaxed base rules, `ts/no-explicit-any: error`,
-  `unused-imports/no-unused-vars: error`
-- **Backend** (`app/backend/**/*.ts`) — strict type safety:
-  `no-unsafe-assignment`, `no-unsafe-call`, `strict-boolean-expressions`, etc.
-- **Frontend** (`app/frontend/**/*.{ts,tsx}`) — Next.js + React rules, looser
-  type safety
-- **Tests** (`**/*.spec.ts`, `**/*.test.ts{x}`) — loosest type safety for
-  mocks/assertions
-
-### Prettier
-
-Configured via `.prettierrc`:
-
-- Single quotes, semicolons, trailing commas
-- 100 character print width, 2-space tabs
-- Tailwind CSS plugin for class sorting
-- YAML overrides (no single quotes)
-- Markdown overrides (80 char width, prose wrap)
+- **Global** — `preset: recommended`, `noUnusedVariables: error`,
+  `noExplicitAny: error`, `noConsole: off`
+- **Frontend** (`app/frontend/**/*.ts{x}`) — `noExplicitAny: off`
+- **Tests** (`**/*.spec.ts`, `**/*.test.ts{x}`) — `noExplicitAny: off`,
+  `noUnusedVariables: off`, `noUnusedImports: off`, `noImgElement: off`
+- **Formatter** — single quotes, semicolons, trailing commas `all`,
+  100 width, 2-space, `tailwindDirectives: true` for CSS
+- **Parser** — `unsafeParameterDecoratorsEnabled: true` for NestJS

@@ -60,9 +60,7 @@
     "rules": {
       "preset": "recommended",
       "correctness": {
-        "noUnusedVariables": "error",
-        "noUnusedImports": "off",
-        "noVoidTypeReturn": "off"
+        "noUnusedVariables": "error"
       },
       "suspicious": {
         "noExplicitAny": "error",
@@ -72,14 +70,6 @@
         "useImportType": "off",
         "noCommonJs": "off"
       },
-      "complexity": {
-        "noBannedTypes": "off",
-        "useOptionalChain": "off"
-      },
-      "performance": {
-        "noImgElement": "off"
-      },
-      "a11y": "off",
       "nursery": "off"
     }
   },
@@ -133,6 +123,9 @@
           "correctness": {
             "noUnusedVariables": "off",
             "noUnusedImports": "off"
+          },
+          "performance": {
+            "noImgElement": "off"
           }
         }
       }

@@ -166,14 +166,14 @@ describe('Card Integration', () => {
           <CardTitle>Test Title</CardTitle>
           <CardDescription>Test Description</CardDescription>
           <CardAction>
-            <button>Action</button>
+            <button type="button">Action</button>
           </CardAction>
         </CardHeader>
         <CardContent>
           <p>Main content here</p>
         </CardContent>
         <CardFooter>
-          <button>Footer Action</button>
+          <button type="button">Footer Action</button>
         </CardFooter>
       </Card>,
     );
