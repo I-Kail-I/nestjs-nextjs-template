@@ -12,26 +12,23 @@
     "docker:down": "docker compose -f docker-compose.prod.yml down",
     "build-prod": "docker compose -f docker-compose.prod.yml build",
     "build:no-cache-prod": "docker compose -f docker-compose.prod.yml build --no-cache",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "format:backend": "prettier --write \"app/backend/**/*.{ts,js,json}\"",
-    "format:frontend": "prettier --write \"app/frontend/**/*.{ts,tsx,js,jsx,json}\"",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "lint:backend": "eslint \"app/backend/**/*.ts\"",
-    "lint:frontend": "eslint \"app/frontend/**/*.ts\" \"app/frontend/**/*.tsx\"",
+    "format": "biome check --write .",
+    "format:check": "biome check .",
+    "format:backend": "biome check --write ./app/backend",
+    "format:frontend": "biome check --write ./app/frontend",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "lint:backend": "biome lint ./app/backend",
+    "lint:frontend": "biome lint ./app/frontend",
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
     "test": "npm run test:backend && npm run test:frontend",
     "test:backend": "npm --workspace=backend test",
     "test:frontend": "npm --workspace=frontend test"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^9.1.0",
-    "@eslint-react/eslint-plugin": "^5.12.0",
-    "concurrently": "^10.0.3",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-react-refresh": "^0.5.3",
-    "prettier": "^3.9.4",
-    "prettier-plugin-tailwindcss": "^0.8.0"
+    "@biomejs/biome": "2.5.10",
+    "concurrently": "^10.0.3"
   },
   "workspaces": [
     "./app/*"
