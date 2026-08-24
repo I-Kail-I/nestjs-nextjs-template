@@ -165,26 +165,57 @@ describe('Auth API (e2e)', () => {
     it.each([
       [
         'missing first name',
-        { last_name: 'Doe', email: 'person@example.com', password: validPassword },
+        {
+          last_name: 'Doe',
+          email: 'person@example.com',
+          password: validPassword,
+        },
       ],
       [
         'missing last name',
-        { first_name: 'Jane', email: 'person@example.com', password: validPassword },
+        {
+          first_name: 'Jane',
+          email: 'person@example.com',
+          password: validPassword,
+        },
       ],
       ['missing email', { first_name: 'Jane', last_name: 'Doe', password: validPassword }],
       ['missing password', { first_name: 'Jane', last_name: 'Doe', email: 'person@example.com' }],
       [
         'empty first name',
-        { first_name: '', last_name: 'Doe', email: 'person@example.com', password: validPassword },
+        {
+          first_name: '',
+          last_name: 'Doe',
+          email: 'person@example.com',
+          password: validPassword,
+        },
       ],
       [
         'empty last name',
-        { first_name: 'Jane', last_name: '', email: 'person@example.com', password: validPassword },
+        {
+          first_name: 'Jane',
+          last_name: '',
+          email: 'person@example.com',
+          password: validPassword,
+        },
       ],
-      ['empty email', { first_name: 'Jane', last_name: 'Doe', email: '', password: validPassword }],
+      [
+        'empty email',
+        {
+          first_name: 'Jane',
+          last_name: 'Doe',
+          email: '',
+          password: validPassword,
+        },
+      ],
       [
         'invalid email',
-        { first_name: 'Jane', last_name: 'Doe', email: 'not-an-email', password: validPassword },
+        {
+          first_name: 'Jane',
+          last_name: 'Doe',
+          email: 'not-an-email',
+          password: validPassword,
+        },
       ],
       [
         'uppercase email',
@@ -197,7 +228,12 @@ describe('Auth API (e2e)', () => {
       ],
       [
         'short password',
-        { first_name: 'Jane', last_name: 'Doe', email: 'person@example.com', password: '12345' },
+        {
+          first_name: 'Jane',
+          last_name: 'Doe',
+          email: 'person@example.com',
+          password: '12345',
+        },
       ],
       [
         'null first name',
@@ -210,7 +246,12 @@ describe('Auth API (e2e)', () => {
       ],
       [
         'non-string password',
-        { first_name: 'Jane', last_name: 'Doe', email: 'person@example.com', password: 123456 },
+        {
+          first_name: 'Jane',
+          last_name: 'Doe',
+          email: 'person@example.com',
+          password: 123456,
+        },
       ],
     ])('rejects %s with 400 Bad Request', async (_case, payload) => {
       const response = await api()
@@ -287,7 +328,10 @@ describe('Auth API (e2e)', () => {
     it('returns 404 for an email that is not registered', async () => {
       const response = await api()
         .post('/api/auth/login/email-password')
-        .send({ email: `${testEmailPrefix}-missing@example.com`, password: validPassword })
+        .send({
+          email: `${testEmailPrefix}-missing@example.com`,
+          password: validPassword,
+        })
         .expect(404);
 
       expect(response.body).toEqual({

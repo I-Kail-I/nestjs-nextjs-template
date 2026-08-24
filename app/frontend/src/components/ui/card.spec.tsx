@@ -21,13 +21,13 @@ describe('Card', () => {
   });
 
   it('renders with sm size', () => {
-    render(<Card size="sm">Small Card</Card>);
+    render(<Card size='sm'>Small Card</Card>);
     const card = screen.getByText('Small Card');
     expect(card).toHaveAttribute('data-size', 'sm');
   });
 
   it('applies custom className', () => {
-    render(<Card className="custom-class">Card</Card>);
+    render(<Card className='custom-class'>Card</Card>);
     const card = screen.getByText('Card');
     expect(card).toHaveClass('custom-class');
   });
@@ -41,7 +41,7 @@ describe('Card', () => {
   });
 
   it('passes additional HTML attributes', () => {
-    render(<Card id="test-card">Card</Card>);
+    render(<Card id='test-card'>Card</Card>);
     const card = screen.getByText('Card');
     expect(card).toHaveAttribute('id', 'test-card');
   });
@@ -56,7 +56,7 @@ describe('CardHeader', () => {
   });
 
   it('applies custom className', () => {
-    render(<CardHeader className="custom-header">Header</CardHeader>);
+    render(<CardHeader className='custom-header'>Header</CardHeader>);
     const header = screen.getByText('Header');
     expect(header).toHaveClass('custom-header');
   });
@@ -78,7 +78,7 @@ describe('CardTitle', () => {
   });
 
   it('applies custom className', () => {
-    render(<CardTitle className="custom-title">Title</CardTitle>);
+    render(<CardTitle className='custom-title'>Title</CardTitle>);
     const title = screen.getByText('Title');
     expect(title).toHaveClass('custom-title');
   });
@@ -166,14 +166,14 @@ describe('Card Integration', () => {
           <CardTitle>Test Title</CardTitle>
           <CardDescription>Test Description</CardDescription>
           <CardAction>
-            <button>Action</button>
+            <button type='button'>Action</button>
           </CardAction>
         </CardHeader>
         <CardContent>
           <p>Main content here</p>
         </CardContent>
         <CardFooter>
-          <button>Footer Action</button>
+          <button type='button'>Footer Action</button>
         </CardFooter>
       </Card>,
     );
@@ -187,7 +187,7 @@ describe('Card Integration', () => {
 
   it('renders card with sm size and proper title styling', () => {
     render(
-      <Card size="sm">
+      <Card size='sm'>
         <CardHeader>
           <CardTitle>Small Card Title</CardTitle>
         </CardHeader>
@@ -201,12 +201,12 @@ describe('Card Integration', () => {
   it('handles multiple cards independently', () => {
     render(
       <>
-        <Card data-testid="card-1">
+        <Card data-testid='card-1'>
           <CardHeader>
             <CardTitle>Card 1</CardTitle>
           </CardHeader>
         </Card>
-        <Card data-testid="card-2" size="sm">
+        <Card data-testid='card-2' size='sm'>
           <CardHeader>
             <CardTitle>Card 2</CardTitle>
           </CardHeader>
@@ -226,7 +226,7 @@ describe('Card Integration', () => {
   it('renders card with image', () => {
     render(
       <Card>
-        <img src="test.jpg" alt="test" />
+        <img src='test.jpg' alt='test' />
         <CardContent>Content</CardContent>
       </Card>,
     );

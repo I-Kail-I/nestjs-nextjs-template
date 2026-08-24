@@ -9,12 +9,12 @@ describe('Button', () => {
   });
 
   it('applies variant classes', () => {
-    const { container } = render(<Button variant="destructive">Delete</Button>);
+    const { container } = render(<Button variant='destructive'>Delete</Button>);
     expect(container.firstChild).toHaveClass('bg-destructive/10');
   });
 
   it('applies size classes', () => {
-    const { container } = render(<Button size="sm">Small</Button>);
+    const { container } = render(<Button size='sm'>Small</Button>);
     expect(container.firstChild).toHaveClass('h-8');
   });
 
@@ -26,7 +26,7 @@ describe('Button', () => {
   });
 
   it('forwards additional className', () => {
-    const { container } = render(<Button className="custom-class">Styled</Button>);
+    const { container } = render(<Button className='custom-class'>Styled</Button>);
     expect(container.firstChild).toHaveClass('custom-class');
   });
 });

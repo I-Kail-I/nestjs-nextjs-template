@@ -3,8 +3,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Role } from '@/generated/prisma/enums';
 import { BcryptService } from '@/lib/bcrypt/bcrypt.service';
 import { PrismaService } from '@/lib/prisma/prisma.service';
+import { RedisService } from '@/lib/redis/redis.service';
 import { AuthService } from './auth.service';
-import { SESSION_TTL_MS } from './passport-session.strategy';
+import { sessionRedisKey, SESSION_TTL_MS } from './passport-session.strategy';
 
 jest.mock('@/lib/prisma/prisma.service', () => ({
   PrismaService: jest.fn().mockImplementation(() => ({
@@ -15,6 +16,7 @@ jest.mock('@/lib/prisma/prisma.service', () => ({
     },
     session: {
       create: jest.fn(),
+      findMany: jest.fn(),
       deleteMany: jest.fn(),
     },
   })),
@@ -23,6 +25,12 @@ jest.mock('@/lib/prisma/prisma.service', () => ({
 const mockBcrypt = {
   hashPassword: jest.fn().mockResolvedValue('hashed-password'),
   comparePassword: jest.fn(),
+};
+
+const mockRedis = {
+  set: jest.fn().mockResolvedValue('OK'),
+  get: jest.fn(),
+  del: jest.fn().mockResolvedValue(1),
 };
 
 function createMockUser(overrides = {}) {
@@ -48,7 +56,12 @@ describe('AuthService', () => {
     jest.clearAllMocks();
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [AuthService, PrismaService, { provide: BcryptService, useValue: mockBcrypt }],
+      providers: [
+        AuthService,
+        PrismaService,
+        { provide: BcryptService, useValue: mockBcrypt },
+        { provide: RedisService, useValue: mockRedis },
+      ],
     }).compile();
 
     service = module.get<AuthService>(AuthService);
@@ -133,6 +146,12 @@ describe('AuthService', () => {
         data: { user_id: user.id, expires_at: expiresAt },
         select: { id: true },
       });
+      expect(mockRedis.set).toHaveBeenCalledWith(
+        sessionRedisKey('session-1'),
+        JSON.stringify(expectedResult),
+        'PX',
+        SESSION_TTL_MS,
+      );
       nowSpy.mockRestore();
     });
 
@@ -166,38 +185,49 @@ describe('AuthService', () => {
   });
 
   describe('logout', () => {
-    it('should delete the session when a token is provided', async () => {
+    it('should delete the Redis and DB session when a token is provided', async () => {
       await service.logout('session-1');
 
+      expect(mockRedis.del).toHaveBeenCalledWith(sessionRedisKey('session-1'));
       expect(prisma.session.deleteMany).toHaveBeenCalledWith({ where: { id: 'session-1' } });
     });
 
     it('should ignore missing tokens', async () => {
       await service.logout(undefined);
 
+      expect(mockRedis.del).not.toHaveBeenCalled();
       expect(prisma.session.deleteMany).not.toHaveBeenCalled();
     });
   });
 
   describe('remove', () => {
-    it('should delete sessions, delete user, and return user without password', async () => {
+    it('should delete Redis sessions, DB sessions, and delete the user', async () => {
       const user = createMockUser();
       const { password: _password, ...safeUser } = user;
 
       (prisma.user.findUniqueOrThrow as jest.Mock).mockResolvedValue(user);
-      (prisma.session.deleteMany as jest.Mock).mockResolvedValue({ count: 1 });
+      (prisma.session.findMany as jest.Mock).mockResolvedValue([
+        { id: 'session-1' },
+        { id: 'session-2' },
+      ]);
+      (prisma.session.deleteMany as jest.Mock).mockResolvedValue({ count: 2 });
       (prisma.user.delete as jest.Mock).mockResolvedValue(safeUser);
 
       const result = await service.remove(user.id);
 
       expect(result).toEqual(safeUser);
+      expect(mockRedis.del).toHaveBeenCalledWith('session:session-1', 'session:session-2');
+      expect(prisma.session.findMany).toHaveBeenCalledWith({
+        where: { user_id: user.id },
+        select: { id: true },
+      });
       expect(prisma.session.deleteMany).toHaveBeenCalledWith({ where: { user_id: user.id } });
       expect(prisma.user.delete).toHaveBeenCalledWith({
         where: { id: user.id },
         omit: { password: true },
       });
-      expect((prisma.session.deleteMany as jest.Mock).mock.invocationCallOrder[0]).toBeLessThan(
-        (prisma.user.delete as jest.Mock).mock.invocationCallOrder[0],
+      expect((mockRedis.del as jest.Mock).mock.invocationCallOrder[0]).toBeLessThan(
+        (prisma.session.deleteMany as jest.Mock).mock.invocationCallOrder[0],
       );
     });
 
@@ -205,6 +235,7 @@ describe('AuthService', () => {
       (prisma.user.findUniqueOrThrow as jest.Mock).mockRejectedValue(new NotFoundException());
 
       await expect(service.remove('missing-user-id')).rejects.toThrow(NotFoundException);
+      expect(mockRedis.del).not.toHaveBeenCalled();
       expect(prisma.session.deleteMany).not.toHaveBeenCalled();
       expect(prisma.user.delete).not.toHaveBeenCalled();
     });
@@ -214,6 +245,7 @@ describe('AuthService', () => {
       (prisma.user.findUniqueOrThrow as jest.Mock).mockResolvedValue(user);
 
       await expect(service.remove(user.id)).rejects.toThrow('User is already not active');
+      expect(mockRedis.del).not.toHaveBeenCalled();
       expect(prisma.session.deleteMany).not.toHaveBeenCalled();
       expect(prisma.user.delete).not.toHaveBeenCalled();
     });

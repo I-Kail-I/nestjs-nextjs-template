@@ -29,4 +29,4 @@ COPY --from=builder /app/app/frontend/.next/standalone ./
 
 EXPOSE 3000
 
-CMD ["node", "app/frontend/server.js"]
+CMD ["npm", "start", "--workspace=frontend"]

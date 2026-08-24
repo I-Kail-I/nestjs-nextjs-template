@@ -26,25 +26,25 @@ describe('Input', () => {
   });
 
   it('applies custom className', () => {
-    render(<Input className="custom-class" />);
+    render(<Input className='custom-class' />);
     const input = screen.getByRole('textbox');
     expect(input).toHaveClass('custom-class');
   });
 
   it('sets the type attribute', () => {
-    render(<Input type="email" />);
+    render(<Input type='email' />);
     const input = screen.getByRole('textbox');
     expect(input).toHaveAttribute('type', 'email');
   });
 
   it('renders as password input when type is password', () => {
-    render(<Input type="password" />);
+    render(<Input type='password' />);
     const input = screen.getByDisplayValue('');
     expect(input).toHaveAttribute('type', 'password');
   });
 
   it('passes additional HTML attributes', () => {
-    render(<Input placeholder="Enter text" id="test-input" name="test-name" />);
+    render(<Input placeholder='Enter text' id='test-input' name='test-name' />);
     const input = screen.getByPlaceholderText('Enter text');
     expect(input).toHaveAttribute('id', 'test-input');
     expect(input).toHaveAttribute('name', 'test-name');
@@ -80,19 +80,19 @@ describe('Input', () => {
   });
 
   it('renders with a default value', () => {
-    render(<Input defaultValue="Default text" />);
+    render(<Input defaultValue='Default text' />);
     const input = screen.getByDisplayValue('Default text');
     expect(input).toBeInTheDocument();
   });
 
   it('renders with a controlled value', () => {
-    render(<Input value="Controlled text" readOnly />);
+    render(<Input value='Controlled text' readOnly />);
     const input = screen.getByDisplayValue('Controlled text');
     expect(input).toBeInTheDocument();
   });
 
   it('applies aria attributes correctly', () => {
-    render(<Input aria-label="test label" aria-invalid={true} />);
+    render(<Input aria-label='test label' aria-invalid={true} />);
     const input = screen.getByLabelText('test label');
     expect(input).toHaveAttribute('aria-invalid', 'true');
     expect(input).toHaveClass('aria-invalid:border-destructive');
@@ -125,7 +125,7 @@ describe('Input', () => {
   });
 
   it('renders with number type', () => {
-    render(<Input type="number" min={0} max={100} />);
+    render(<Input type='number' min={0} max={100} />);
     const input = screen.getByRole('spinbutton');
     expect(input).toHaveAttribute('type', 'number');
     expect(input).toHaveAttribute('min', '0');
@@ -133,7 +133,7 @@ describe('Input', () => {
   });
 
   it('applies file input classes when type is file', () => {
-    render(<Input type="file" />);
+    render(<Input type='file' />);
     const input = screen.getByDisplayValue('');
     expect(input).toHaveAttribute('type', 'file');
     expect(input).toHaveClass('file:text-foreground');

@@ -36,7 +36,7 @@ describe('Spinner', () => {
   });
 
   it('applies custom className', () => {
-    render(<Spinner className="text-primary size-8" />);
+    render(<Spinner className='text-primary size-8' />);
     const spinner = screen.getByRole('status');
     expect(spinner).toHaveClass('text-primary');
     expect(spinner).toHaveClass('size-8');
@@ -44,13 +44,13 @@ describe('Spinner', () => {
   });
 
   it('passes additional HTML attributes', () => {
-    render(<Spinner id="test-spinner" data-testid="spinner" />);
+    render(<Spinner id='test-spinner' data-testid='spinner' />);
     const spinner = screen.getByTestId('spinner');
     expect(spinner).toHaveAttribute('id', 'test-spinner');
   });
 
   it('combines custom and default classes', () => {
-    render(<Spinner className="custom-class" />);
+    render(<Spinner className='custom-class' />);
     const spinner = screen.getByRole('status');
     expect(spinner).toHaveClass('custom-class');
     expect(spinner).toHaveClass('size-4');
@@ -58,7 +58,7 @@ describe('Spinner', () => {
   });
 
   it('renders with custom aria-label', () => {
-    render(<Spinner aria-label="Processing..." />);
+    render(<Spinner aria-label='Processing...' />);
     const spinner = screen.getByLabelText('Processing...');
     expect(spinner).toBeInTheDocument();
     expect(spinner).toHaveAttribute('aria-label', 'Processing...');
@@ -73,8 +73,8 @@ describe('Spinner', () => {
   it('renders multiple spinners independently', () => {
     render(
       <>
-        <Spinner data-testid="spinner-1" className="text-blue-500" />
-        <Spinner data-testid="spinner-2" className="text-red-500" />
+        <Spinner data-testid='spinner-1' className='text-blue-500' />
+        <Spinner data-testid='spinner-2' className='text-red-500' />
       </>,
     );
 

@@ -9,7 +9,6 @@ export class MorganMiddleware implements NestMiddleware {
     this.logger.setContext('HTTP');
   }
 
-  // eslint-disable-next-line react/no-unnecessary-use-prefix
   use(req: Request, res: Response, next: NextFunction) {
     const morganFormat = ':method :url :status :response-time ms';
 
