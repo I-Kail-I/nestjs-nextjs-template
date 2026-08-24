@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { describe, expect, it, beforeEach } from 'bun:test';
 import { HealthController } from './health.controller';
 
 describe('HealthController', () => {

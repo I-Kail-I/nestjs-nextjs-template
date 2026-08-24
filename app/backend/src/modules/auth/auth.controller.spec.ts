@@ -1,6 +1,7 @@
 import type { Response } from 'express';
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { describe, expect, it, beforeEach, jest } from 'bun:test';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import {
@@ -9,16 +10,7 @@ import {
   SESSION_COOKIE,
   sessionCookieOptions,
 } from './passport-session.strategy';
-
-jest.mock('@/lib/prisma/prisma.service', () => ({
-  PrismaService: jest.fn().mockImplementation(() => ({
-    user: {
-      findUnique: jest.fn(),
-      create: jest.fn(),
-      delete: jest.fn(),
-    },
-  })),
-}));
+import { AuthResponseDto } from './dto/response-auth.dto';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -81,7 +73,15 @@ describe('AuthController', () => {
         first_name: 'John',
         last_name: 'Doe',
       };
-      const expected = { email: 'test@example.com', first_name: 'John', last_name: 'Doe' };
+      const expected: AuthResponseDto = {
+        email: 'test@example.com',
+        first_name: 'John',
+        last_name: 'Doe',
+        role: 'user',
+        is_active: true,
+        created_at: new Date('2026-01-01T00:00:00.000Z'),
+        updated_at: new Date('2026-01-01T00:00:00.000Z'),
+      };
       mockAuthService.register.mockResolvedValue(expected);
 
       const result = await controller.register(dto);
