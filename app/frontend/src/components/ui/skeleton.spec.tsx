@@ -1,6 +1,6 @@
+import { describe, expect, it } from 'bun:test';
 import { render, screen } from '@testing-library/react';
 import { Skeleton } from './skeleton';
-import '@testing-library/jest-dom';
 
 describe('Skeleton', () => {
   it('renders a div element', () => {

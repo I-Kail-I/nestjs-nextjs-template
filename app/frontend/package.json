@@ -4,12 +4,12 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "node .next/standalone/app/frontend/server.js",
-    "format": "npm run format:frontend --prefix ../..",
-    "lint": "npm run lint:frontend --prefix ../..",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "start": "bun .next/standalone/app/frontend/server.js",
+    "format": "bun run --cwd ../.. format:frontend",
+    "lint": "bun run --cwd ../.. lint:frontend",
+    "test": "bun test",
+    "test:watch": "bun test --watch",
+    "test:coverage": "bun test --coverage"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
@@ -28,19 +28,17 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@happy-dom/global-registrator": "^20.0.10",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
-    "@types/jest": "^30.0.0",
+    "@types/bun": "1.4.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "1.0.0",
-    "jest": "^30.4.2",
-    "jest-environment-jsdom": "^30.4.1",
     "tailwindcss": "^4",
-    "ts-jest": "^29.4.11",
     "typescript": "^5"
   }
 }

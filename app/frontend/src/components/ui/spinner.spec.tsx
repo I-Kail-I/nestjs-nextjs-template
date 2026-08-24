@@ -1,6 +1,6 @@
+import { describe, expect, it } from 'bun:test';
 import { render, screen } from '@testing-library/react';
 import { Spinner } from './spinner';
-import '@testing-library/jest-dom';
 
 describe('Spinner', () => {
   it('renders an svg element', () => {
@@ -67,7 +67,8 @@ describe('Spinner', () => {
   it('renders with custom styles', () => {
     render(<Spinner style={{ color: 'red', width: '32px' }} />);
     const spinner = screen.getByRole('status');
-    expect(spinner).toHaveStyle({ color: 'rgb(255, 0, 0)', width: '32px' });
+    expect(spinner.style.color).toBe('red');
+    expect(spinner.style.width).toBe('32px');
   });
 
   it('renders multiple spinners independently', () => {

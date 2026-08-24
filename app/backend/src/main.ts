@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import helmet from 'helmet';
@@ -12,7 +13,7 @@ async function bootstrap() {
     bufferLogs: true,
   });
 
-  const PORT: number = Number(process.env.PORT ?? 8000);
+  const PORT = Number(process.env.PORT ?? 8000);
 
   // Enable and app using helper
   app.useLogger(app.get(Logger));

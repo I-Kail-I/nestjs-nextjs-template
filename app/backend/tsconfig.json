@@ -16,7 +16,7 @@
       "@/common/*": ["src/common/*"]
     },
     "resolvePackageJsonExports": true,
-    "types": ["jest", "node"],
+    "types": ["bun"],
     "strictBindCallApply": false,
     "strictNullChecks": true,
     "noFallthroughCasesInSwitch": false,

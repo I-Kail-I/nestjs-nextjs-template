@@ -1,4 +1,4 @@
-FROM bun:1.4-slim@sha256:e0ee68d16ccb9927bf02aa7dd8fd4bf3369ee6d46da04faa72b05ce8bfd135f6 AS base
+FROM oven/bun:1-slim@sha256:e0ee68d16ccb9927bf02aa7dd8fd4bf3369ee6d46da04faa72b05ce8bfd135f6 AS base
 
 USER root
 WORKDIR /app
@@ -7,32 +7,32 @@ WORKDIR /app
 FROM base AS builder
 
 # Copy manifests for caching
-COPY package.json package-lock.json ./
+COPY package.json bun.lock ./
 COPY app/backend/package.json ./app/backend/
 
 # Install dependencies
-RUN npm ci
+RUN bun install --frozen-lockfile
 
 # Copy source code
 COPY app/backend ./app/backend
 
 # Build backend app & generate database client
-RUN npm run db:generate --workspace=backend
-RUN npm run build --workspace=backend
+RUN bun run --filter backend db:generate
+RUN bun run --filter backend build
 
 
 # ===== PRODUCTION STAGE =====
 FROM base AS prod
 
 # Copy manifests for production install
-COPY package.json package-lock.json ./
+COPY package.json bun.lock ./
 COPY app/backend/package.json ./app/backend/
 
 # Install production dependencies only
-RUN npm ci --omit=dev --workspace=backend
+RUN bun install --frozen-lockfile --production
 
 # Compiled build from builder
 COPY --from=builder /app/app/backend/dist ./app/backend/dist
 
 EXPOSE 8000
-CMD ["npm", "run", "start:prod", "--workspace=backend"]
+CMD ["bun", "run", "--filter", "backend", "start:prod"]

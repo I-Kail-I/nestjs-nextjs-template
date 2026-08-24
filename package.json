@@ -5,30 +5,29 @@
   "author": "I-Kail-I",
   "license": "MIT",
   "scripts": {
-    "dev": "concurrently --names \"BACKEND,FRONTEND\" --prefix-colors \"blue,green\" \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "dev:backend": "npm --workspace=backend run start:dev",
-    "dev:frontend": "npm --workspace=frontend run dev",
+    "dev": "bun run --parallel dev:backend dev:frontend",
+    "dev:backend": "bun run --filter backend start:dev",
+    "dev:frontend": "bun run --filter frontend dev",
     "docker:up-prod": "docker compose -f docker-compose.prod.yml up -d",
     "docker:down": "docker compose -f docker-compose.prod.yml down",
     "build-prod": "docker compose -f docker-compose.prod.yml build",
     "build:no-cache-prod": "docker compose -f docker-compose.prod.yml build --no-cache",
-    "format": "npm run check:fix",
-    "format:check": "npm run check",
+    "format": "bun run check:fix",
+    "format:check": "bun run check",
     "format:backend": "biome check --write ./app/backend",
     "format:frontend": "biome check --write ./app/frontend",
-    "lint": "npm run check",
-    "lint:fix": "npm run check:fix",
+    "lint": "bun run check",
+    "lint:fix": "bun run check:fix",
     "lint:backend": "biome check ./app/backend",
     "lint:frontend": "biome check ./app/frontend",
     "check": "biome check .",
     "check:fix": "biome check --write .",
-    "test": "npm run test:backend && npm run test:frontend",
-    "test:backend": "npm --workspace=backend test",
-    "test:frontend": "npm --workspace=frontend test"
+    "test": "bun run test:backend && bun run test:frontend",
+    "test:backend": "bun run --filter backend test",
+    "test:frontend": "bun run --filter frontend test"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.10",
-    "concurrently": "^10.0.3"
+    "@biomejs/biome": "2.5.10"
   },
   "workspaces": [
     "./app/*"
