@@ -12,7 +12,7 @@ COPY package.json bun.lock ./
 COPY app/frontend/package.json ./app/frontend/
 
 # Install ALL dependencies
-RUN bun install --frozen-lockfile
+RUN bun install --frozen-lockfile --filter frontend
 
 # Copy source code
 COPY app/frontend ./app/frontend

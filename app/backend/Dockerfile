@@ -29,7 +29,7 @@ COPY package.json bun.lock ./
 COPY app/backend/package.json ./app/backend/
 
 # Install production dependencies only
-RUN bun install --frozen-lockfile --production
+RUN bun install --frozen-lockfile --production --filter backend
 
 # Compiled build from builder
 COPY --from=builder /app/app/backend/dist ./app/backend/dist
