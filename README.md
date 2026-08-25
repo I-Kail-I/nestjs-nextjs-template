@@ -7,6 +7,7 @@ A production-ready full-stack monorepo with **NestJS 11** (backend) and
 
 | Layer    | Tech                                                                                            |
 | -------- | ----------------------------------------------------------------------------------------------- |
+| Runtime  | Bun (runtime, package manager, test runner)                                                     |
 | Backend  | NestJS 11, TypeScript, Prisma 7 + PostgreSQL, SWC, Passport (cookie sessions), bcryptjs, Helmet |
 | Frontend | Next.js 16, React 19, Tailwind v4, shadcn/ui (base-vega), Base UI                               |
 | Data     | TanStack React Query, Zustand, Zod v4, Axios                                                    |
@@ -15,17 +16,22 @@ A production-ready full-stack monorepo with **NestJS 11** (backend) and
 
 ## Prerequisites
 
-- Node.js `24.15.0` (set via `.nvmrc`)
+- Bun `1.4` (runtime + package manager + test runner) — the same version
+  pinned in the Dockerfiles and GitHub Actions workflow
 - Docker & Docker Compose (for Postgres + Redis)
 
 ## Quick Start
 
 ```bash
-npm install                          # install all the deps
+bun install                          # install all the deps
 docker compose up -d                 # start Postgres & Redis
-npm run db:migrate-dev --workspace=backend   # run Prisma migrations
-npm run dev                          # starts both backend & frontend
+bun run --filter backend db:migrate-dev <migration-name>   # create/apply a Prisma dev migration
+bun run dev                          # starts both backend & frontend
 ```
+
+> Running an existing migration instead? Use
+> `bun run --filter backend db:migrate-prod` (applies all pending migrations
+> without creating a new one).
 
 ## Project Structure
 
@@ -33,11 +39,10 @@ npm run dev                          # starts both backend & frontend
 ├── .env                              # Local environment variables (gitignored)
 ├── .env.example                      # Environment variable template
 ├── .gitignore                        # Root gitignore
-├── .nvmrc                            # Node.js 24.15.0
 ├── biome.json                        # Biome config (formatter + linter, overrides)
 ├── tsconfig.json                     # TypeScript project references (frontend + backend)
-├── package.json                      # Root workspace (concurrently, lint, format, test)
-├── package-lock.json
+├── package.json                      # Root workspace (dev scripts, lint, format, test)
+├── bun.lock                          # Bun lockfile (all workspaces)
 ├── docker-compose.yml                # Dev services (Postgres 17, Redis 7)
 ├── docker-compose.prod.yml           # Production stack (Caddy + backend + frontend)
 │
@@ -53,14 +58,13 @@ npm run dev                          # starts both backend & frontend
     │
     ├── backend/                      # NestJS 11 API (port 8000)
     │   ├── package.json
-    │   ├── package-lock.json
     │   ├── .env.example              # Backend environment variables (PORT, DATABASE_URL, ...)
     │   ├── tsconfig.json             # ES2023, nodenext, decorators, path aliases (@/)
     │   ├── tsconfig.build.json       # Build config (excludes tests, dist)
     │   ├── nest-cli.json             # SWC builder, deleteOutDir
     │   ├── prisma.config.ts          # Prisma 7 config (schema path, datasource from env)
     │   ├── .dockerignore
-    │   ├── Dockerfile                # Multi-stage: builder (npm ci + generate + build) → prod
+    │   ├── Dockerfile                # Multi-stage: builder (bun install + generate + build) → prod
     │   │
     │   ├── prisma/
     │   │   ├── schema.prisma         # PostgreSQL datasource (schema: auth), User + Session + Role enums
@@ -70,8 +74,7 @@ npm run dev                          # starts both backend & frontend
     │   │           └── migration.sql
     │   │
     │   ├── test/
-    │   │   ├── jest-e2e.json         # E2E test runner config
-    │   │   └── auth.e2e-spec.ts      # Auth E2E tests (register, login, session, delete-account)
+    │   │   └── auth.e2e-spec.ts      # Auth E2E tests (bun test, opt-in; register, login, session, delete-account)
     │   │
     │   └── src/
     │       ├── main.ts                # App bootstrap: ValidationPipe, Helmet, cookie-parser, global filters, Swagger (dev), global prefix 'api'
@@ -122,17 +125,16 @@ npm run dev                          # starts both backend & frontend
     │
     └── frontend/                     # Next.js 16 App Router (port 3000)
         ├── package.json
-        ├── package-lock.json
         ├── tsconfig.json             # bundler mode, composite, path alias @/ → src/*
         ├── next.config.ts            # API rewrites, React Compiler enabled
         ├── next-env.d.ts
-        ├── jest.config.ts            # jsdom, ts-jest, CSS mocks, @testing-library setup
+        ├── bunfig.toml               # bun test preload (happy-dom + Testing Library setup)
         ├── components.json           # shadcn config (base-vega style, Lucide icons, CSS variables)
         ├── postcss.config.mjs        # @tailwindcss/postcss plugin
         ├── .env.example              # Frontend-specific env vars (API_URL, NEXT_PUBLIC_API_PREFIX)
         ├── .gitignore
         ├── .dockerignore
-        ├── Dockerfile                # Multi-stage: builder (npm install + build) → prod (omit=dev, copy .next)
+        ├── Dockerfile                # Multi-stage: builder (bun install + build) → prod (copy .next)
         │
         ├── public/
         │   └── .gitkeep
@@ -177,9 +179,9 @@ npm run dev                          # starts both backend & frontend
             │   └── utils.ts            # cn() utility (clsx + tailwind-merge)
             │
             └── test/
-                ├── setup.ts            # Jest setup: @testing-library/jest-dom
-                └── __mocks__/
-                    └── styleMock.js     # CSS module mock for Jest
+                ├── happydom.ts         # bun test preload: registers happy-dom globals
+                ├── testing-library.ts  # bun test preload: jest-dom matchers + cleanup
+                └── matchers.d.ts       # TS types for jest-dom matchers under bun:test
 ```
 
 ## Feature-first Pattern (Frontend)
@@ -296,73 +298,75 @@ NEXT_PUBLIC_API_PREFIX=/api
 
 ### Global (root)
 
-| Command                   | Description                         |
-| ------------------------- | ----------------------------------- |
-| `npm run dev`             | Run backend + frontend concurrently |
-| `npm run dev:backend`     | Backend only (port 8000)            |
-| `npm run dev:frontend`    | Frontend only (port 3000)           |
-| `npm run lint`            | Biome lint (both projects)          |
-| `npm run lint:fix`        | Biome lint auto-fix                 |
-| `npm run lint:backend`    | Biome lint (backend only)           |
-| `npm run lint:frontend`   | Biome lint (frontend only)          |
-| `npm run test`            | Run all tests (backend → frontend)  |
-| `npm run test:backend`    | Backend unit tests                  |
-| `npm run test:frontend`   | Frontend unit tests                 |
-| `npm run format`          | Biome check --write (all files)     |
-| `npm run format:check`    | Biome check                         |
-| `npm run format:backend`  | Biome check --write (backend only)  |
-| `npm run format:frontend` | Biome check --write (frontend only) |
-| `npm run check`           | Biome check (lint + format)         |
-| `npm run check:fix`       | Biome check --write                 |
+| Command                    | Description                                    |
+| -------------------------- | ---------------------------------------------- |
+| `bun run dev`              | Run backend + frontend in parallel             |
+| `bun run dev:backend`      | Backend only (port 8000)                       |
+| `bun run dev:frontend`     | Frontend only (port 3000)                      |
+| `bun run lint`             | Biome lint (both projects)                     |
+| `bun run lint:fix`         | Biome lint auto-fix                            |
+| `bun run lint:backend`     | Biome lint (backend only)                      |
+| `bun run lint:frontend`    | Biome lint (frontend only)                     |
+| `bun run test`             | Run all tests (backend → frontend)             |
+| `bun run test:backend`     | Backend unit tests (bun test)                  |
+| `bun run test:frontend`    | Frontend unit tests (bun test)                 |
+| `bun run format`           | Biome check --write (all files)                |
+| `bun run format:check`     | Biome check                                    |
+| `bun run format:backend`   | Biome check --write (backend only)             |
+| `bun run format:frontend`  | Biome check --write (frontend only)            |
+| `bun run check`            | Biome check (lint + format)                    |
+| `bun run check:fix`        | Biome check --write                            |
 
 ### Docker
 
-| Command                       | Description                                    |
-| ----------------------------- | ---------------------------------------------- |
-| `docker compose up -d`        | Start Postgres + Redis (dev)                   |
-| `npm run build-prod`          | Build production Docker images                 |
-| `npm run build:no-cache-prod` | Build from scratch (no layer cache)            |
-| `npm run docker:up-prod`      | Deploy full stack (Caddy + backend + frontend) |
-| `npm run docker:down`         | Stop production stack                          |
+| Command                          | Description                                    |
+| -------------------------------- | ---------------------------------------------- |
+| `docker compose up -d`           | Start Postgres + Redis (dev)                   |
+| `bun run build-prod`             | Build production Docker images                 |
+| `bun run build:no-cache-prod`    | Build from scratch (no layer cache)            |
+| `bun run docker:up-prod`         | Deploy full stack (Caddy + backend + frontend) |
+| `bun run docker:down`            | Stop production stack                          |
 
 ### Backend (run from `app/backend`)
 
-| Command                   | Description                |
-| ------------------------- | -------------------------- |
-| `npm start`               | Start production server    |
-| `npm run start:dev`       | Watch mode (SWC)           |
-| `npm run start:debug`     | Debug mode                 |
-| `npm run build`           | Compile TypeScript         |
-| `npm run start:prod`      | Run compiled code          |
-| `npm test`                | Unit tests (Jest)          |
-| `npm run test:watch`      | Watch mode                 |
-| `npm run test:cov`        | With coverage              |
-| `npm run test:e2e`        | E2E tests                  |
-| `npm run db:generate`     | Generate Prisma client     |
-| `npm run db:migrate-dev`  | Create a dev migration     |
-| `npm run db:migrate-prod` | Deploy prod migrations     |
-| `npm run db:studio`       | Open Prisma Studio         |
-| `npm run db:push`         | Push schema directly to DB |
+| Command                   | Description                        |
+| ------------------------- | ---------------------------------- |
+| `bun run start`           | Start server (Nest CLI)            |
+| `bun run start:dev`       | Watch mode (`nest start --watch`)  |
+| `bun run start:debug`     | Debug mode (`nest start --debug --watch`) |
+| `bun run build`           | Compile TypeScript (SWC)           |
+| `bun run start:prod`      | Run compiled code (Bun)            |
+| `bun test`                | Unit tests (bun test)              |
+| `bun run test:watch`      | Watch mode                         |
+| `bun run test:cov`        | With coverage                      |
+| `bun run test:e2e`        | E2E tests (needs Postgres + Redis) |
+| `bun run db:generate`     | Generate Prisma client             |
+| `bun run db:migrate-dev`  | Create a dev migration             |
+| `bun run db:migrate-prod` | Deploy prod migrations             |
+| `bun run db:studio`       | Open Prisma Studio                 |
+| `bun run db:push`         | Push schema directly to DB         |
 
 ### Frontend (run from `app/frontend`)
 
 | Command                 | Description                    |
 | ----------------------- | ------------------------------ |
-| `npm run dev`           | Next.js dev server (Turbopack) |
-| `npm run build`         | Production build               |
-| `npm start`             | Start production server        |
-| `npm test`              | Jest tests (jsdom)             |
-| `npm run test:watch`    | Watch mode                     |
-| `npm run test:coverage` | With coverage                  |
+| `bun run dev`           | Next.js dev server (Turbopack) |
+| `bun run build`         | Production build               |
+| `bun start`             | Start standalone prod server   |
+| `bun test`              | Component tests (happy-dom)    |
+| `bun run test:watch`    | Watch mode                     |
+| `bun run test:coverage` | With coverage                  |
 
 ## CI/CD
 
 GitHub Actions (`.github/workflows/test.yml`) runs on every push and pull
-request with two parallel jobs:
+request with two parallel jobs. Both use `oven-sh/setup-bun@v2` pinned to
+Bun `1.4.0` — the same version used by the production Dockerfiles.
 
-- **Backend** — installs dependencies (`npm ci` at the repo root), then runs
-  `db:generate`, `lint`, and `test`
-- **Frontend** — installs dependencies (`npm ci`), then runs `lint` and `test`
+- **Backend** — installs dependencies (`bun install --frozen-lockfile` at the
+  repo root), then runs `db:generate`, `lint`, and `bun test`
+- **Frontend** — installs dependencies (`bun install --frozen-lockfile`), then
+  runs `lint` and `bun test`
 
 ## Prisma Schema
 

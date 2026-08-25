@@ -28,6 +28,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
 
   async onModuleInit(): Promise<void> {
     await this.$connect();
+    await this.$queryRawUnsafe(`SELECT 1`);
     console.log('database is connected');
   }
 

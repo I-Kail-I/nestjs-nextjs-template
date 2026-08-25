@@ -1,7 +1,8 @@
-import type { Server } from 'node:http';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ThrottlerGuard } from '@nestjs/throttler';
+import { describe, expect, it, beforeAll, afterAll } from 'bun:test';
+import cookieParser from 'cookie-parser';
 import request from 'supertest';
 import { AppModule } from '@/app.module';
 import { PrismaService } from '@/lib/prisma/prisma.service';
@@ -47,8 +48,8 @@ describe('Auth API (e2e)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
 
-  const api = () => request(app.getHttpServer() as Server);
-  const createAgent = () => request.agent(app.getHttpServer() as Server);
+  const api = () => request(app.getHttpServer());
+  const createAgent = () => request.agent(app.getHttpServer());
 
   async function registerAndLogin(registration: Registration) {
     const agent = createAgent();
@@ -97,6 +98,7 @@ describe('Auth API (e2e)', () => {
 
     app = module.createNestApplication();
     app.setGlobalPrefix('api');
+    app.use(cookieParser());
     app.useGlobalPipes(
       new ValidationPipe({
         whitelist: true,
@@ -157,7 +159,7 @@ describe('Auth API (e2e)', () => {
 
       expect(response.body).toEqual({
         statusCode: 409,
-        message: 'Email is already registered',
+        message: 'The record already exists',
         error: 'Conflict',
       });
     });
@@ -336,7 +338,7 @@ describe('Auth API (e2e)', () => {
 
       expect(response.body).toEqual({
         statusCode: 404,
-        message: 'Email is not registered',
+        message: 'The record was not found',
         error: 'Not Found',
       });
     });

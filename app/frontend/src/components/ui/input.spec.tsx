@@ -1,7 +1,7 @@
+import { describe, expect, it, mock } from 'bun:test';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Input } from './input';
-import '@testing-library/jest-dom';
 
 describe('Input', () => {
   it('renders an input element', () => {
@@ -99,7 +99,7 @@ describe('Input', () => {
   });
 
   it('handles onChange callback', async () => {
-    const handleChange = jest.fn();
+    const handleChange = mock();
     const user = userEvent.setup();
 
     render(<Input onChange={handleChange} />);
@@ -110,8 +110,8 @@ describe('Input', () => {
   });
 
   it('handles onFocus and onBlur callbacks', async () => {
-    const handleFocus = jest.fn();
-    const handleBlur = jest.fn();
+    const handleFocus = mock();
+    const handleBlur = mock();
     const user = userEvent.setup();
 
     render(<Input onFocus={handleFocus} onBlur={handleBlur} />);

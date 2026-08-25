@@ -1,4 +1,5 @@
-FROM node:24.15.0-slim@sha256:4e6b70dd6cbfc88c8157ba19aa3d9f9cce6ba4703576d55459e45efcbc9c5f5d AS base
+FROM oven/bun:1-slim@sha256:e0ee68d16ccb9927bf02aa7dd8fd4bf3369ee6d46da04faa72b05ce8bfd135f6 AS base
+
 
 USER root
 WORKDIR /app
@@ -7,17 +8,17 @@ WORKDIR /app
 FROM base AS builder
 
 # Copy manifest files first for cache optimization
-COPY package.json package-lock.json ./
+COPY package.json bun.lock ./
 COPY app/frontend/package.json ./app/frontend/
 
 # Install ALL dependencies
-RUN npm ci
+RUN bun install --frozen-lockfile --filter frontend
 
 # Copy source code
 COPY app/frontend ./app/frontend
 
 # Build Next.js app (creates .next/standalone)
-RUN npm run build --workspace=frontend
+RUN bun run --filter frontend build
 
 # ===== PRODUCTION STAGE =====
 FROM base AS prod
@@ -29,4 +30,4 @@ COPY --from=builder /app/app/frontend/.next/standalone ./
 
 EXPOSE 3000
 
-CMD ["npm", "start", "--workspace=frontend"]
+CMD ["bun", "app/frontend/server.js"]

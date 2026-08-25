@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'bun:test';
 import { render, screen } from '@testing-library/react';
 
 import {
@@ -9,7 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from './card';
-import '@testing-library/jest-dom';
 
 describe('Card', () => {
   it('renders with default props', () => {

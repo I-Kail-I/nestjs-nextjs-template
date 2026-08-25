@@ -3,17 +3,16 @@
   "version": "0.0.1",
   "scripts": {
     "build": "nest build",
-    "format": "npm run format:backend --prefix ../..",
-    "lint": "npm run lint:backend --prefix ../..",
+    "format": "bun run --cwd ../.. format:backend",
+    "lint": "bun run --cwd ../.. lint:backend",
     "start": "nest start",
-    "start:dev": "nest start --watch",
+    "start:dev": "nest start --watch --builder swc ",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "start:prod": "bun dist/main.js",
+    "test": "bun test",
+    "test:watch": "bun test --watch",
+    "test:cov": "bun test --coverage",
+    "test:e2e": "bun test ./test/auth.e2e-spec.ts",
     "db:migrate-dev": "prisma migrate dev --name",
     "db:migrate-prod": "prisma migrate deploy",
     "db:studio": "prisma studio",
@@ -34,6 +33,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
     "cookie-parser": "^1.4.7",
+    "dotenv": "^17.2.3",
     "helmet": "^8.2.0",
     "ioredis": "^6.0.0",
     "morgan": "^1.11.0",
@@ -52,43 +52,16 @@
     "@nestjs/testing": "^11.0.1",
     "@swc/cli": "^0.8.1",
     "@types/bcrypt": "^6.0.0",
+    "@types/bun": "1.4.0",
     "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.0",
-    "@types/jest": "^30.0.0",
     "@types/morgan": "^1.9.10",
-    "@types/node": "^24.0.0",
     "@types/passport": "^1.0.17",
     "@types/pg": "^8.20.0",
     "@types/supertest": "^7.0.0",
     "globals": "^17.0.0",
-    "jest": "^30.0.0",
     "prisma": "^7.8.0",
-    "source-map-support": "^0.5.21",
     "supertest": "^7.0.0",
-    "ts-jest": "^29.2.5",
-    "ts-loader": "^9.5.2",
-    "ts-node": "^10.9.2",
-    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.3"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "ts"
-    ],
-    "rootDir": "src",
-    "testRegex": ".*\\.spec\\.ts$",
-    "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
-    },
-    "collectCoverageFrom": [
-      "**/*.(t|j)s"
-    ],
-    "coverageDirectory": "../coverage",
-    "testEnvironment": "node",
-    "moduleNameMapper": {
-      "^@/(.*)$": "<rootDir>/$1"
-    }
   }
 }
