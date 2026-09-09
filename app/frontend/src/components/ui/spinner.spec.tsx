@@ -36,7 +36,7 @@ describe('Spinner', () => {
   });
 
   it('applies custom className', () => {
-    render(<Spinner className='text-primary size-8' />);
+    render(<Spinner className='size-8 text-primary' />);
     const spinner = screen.getByRole('status');
     expect(spinner).toHaveClass('text-primary');
     expect(spinner).toHaveClass('size-8');

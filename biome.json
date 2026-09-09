@@ -82,6 +82,12 @@
   },
   "overrides": [
     {
+      "includes": ["**/*.css"],
+      "formatter": {
+        "lineWidth": 320
+      }
+    },
+    {
       "includes": ["**/*.json", "**/*.jsonc"],
       "formatter": {
         "trailingCommas": "none"
@@ -109,6 +115,18 @@
         "rules": {
           "suspicious": {
             "noExplicitAny": "off"
+          },
+          "style": {
+            "noDefaultExport": "error"
+          },
+          "nursery": {
+            "useSortedClasses": {
+              "level": "error",
+              "options": {
+                "attributes": ["classList"],
+                "functions": ["clsx", "cva", "cn"]
+              }
+            }
           }
         }
       }
@@ -126,6 +144,30 @@
           },
           "performance": {
             "noImgElement": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "**/page.tsx",
+        "**/page.ts",
+        "**/layout.tsx",
+        "**/layout.ts",
+        "**/not-found.tsx",
+        "**/not-found.ts",
+        "**/loading.tsx",
+        "**/error.tsx",
+        "**/global-error.tsx",
+        "**/template.tsx",
+        "**/next.config.ts",
+        "**/next.config.js",
+        "**/next.config.mjs"
+      ],
+      "linter": {
+        "rules": {
+          "style": {
+            "noDefaultExport": "off"
           }
         }
       }
